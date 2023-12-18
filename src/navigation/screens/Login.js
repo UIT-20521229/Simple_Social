@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { Alert, StyleSheet, Image, Text, Button, TextInput, View, SafeAreaView } from "react-native";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../../config";
+import {
+  Alert, StyleSheet, Image,
+  Text, Button, TextInput, View, SafeAreaView
+} from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import axios from "axios";
 // const backImage = require("../assets/background.jpg");
 
 export default function Login({ navigation }) {
@@ -10,11 +12,12 @@ export default function Login({ navigation }) {
   const [password, setPassword] = useState("");
 
   const onHandleLogin = async () => {
-    if (email && password) {
-      await signInWithEmailAndPassword(auth, email, password)
-        .then(() => console.log("Đăng nhập thành công!"))
-        .catch((error) => Alert.alert("Đăng nhập thất bại", error.message));
-    }
+    await axios.get("http://localhost:3200/api/getAllUsers")
+      .then(res => {
+        console.log(res);
+        console.log(res.data);
+      })
+      .catch(err => console.log(err))
   };
   return (
     <View stlye={styles.container}>

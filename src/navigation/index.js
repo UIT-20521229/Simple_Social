@@ -1,22 +1,23 @@
 import { View, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { onAuthStateChanged } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 import { setUser } from '../redux/slices/userSlice';
-import { auth } from '../../config';
 import { useSelector, useDispatch } from 'react-redux';
 import AuthStack from './stacks/AuthStack';
 import ChatStack from './stacks/ChatStack';
 import { ContactList } from './screens/index';
+import axios from 'axios';
 
 export default function RootNavigator() {
     const { user } = useSelector(state => state.user);
     const dispatch = useDispatch();
 
     useEffect(() => {
-        onAuthStateChanged(auth, u => {
-            dispatch(setUser(u));
-        });
+        axios.get("https://randomuser.me/api/")
+            .then(res => {
+                dispatch(setUser(res.data.results[0]));
+            })
+            .catch(err => console.log(err))
     }, [user]);
 
     // if (isLoading) {
@@ -29,8 +30,8 @@ export default function RootNavigator() {
 
     return (
         <NavigationContainer>
-            {/* {user ? <ChatStack /> : <AuthStack />} */}
-            <ContactList />
+            {user ? <ChatStack /> : <AuthStack />}
+            {/* <ContactList /> */}
         </NavigationContainer>
     )
 }

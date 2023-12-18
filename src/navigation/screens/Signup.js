@@ -1,30 +1,43 @@
+import { Axios } from "axios";
 import React, { useState } from "react";
 import {
   Alert, StyleSheet, Image, Text,
   Button, TextInput, View, SafeAreaView
 } from "react-native";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../../config";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import axios from "axios";
 // const backImage = require("../assets/background.jpg");
 
 export default function Signup({ navigation }) {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [avatar, setAvatar] = useState("");
 
   const onHandleSignup = async () => {
-    if (email !== "" && password !== "") {
-      await createUserWithEmailAndPassword(auth, email, password)
-        .then(() => console.log("Đăng ký thành công!"))
-        .catch((error) => Alert.alert("Đăng ký thất bại", error.message));
-    }
-    else return;
+    await axios.post("http://localhost:3200/api/addUser", {
+      name: name,
+      email: email,
+      password: password,
+      avatar: avatar,
+    })
+      .then(res => {
+        console.log(res);
+        console.log(res.data);
+      })
+      .catch(err => console.log(err))
   };
 
   return (
     <View stlye={styles.container}>
       <SafeAreaView>
         <Text style={styles.text}>Signup</Text>
+        <TextInput
+          style={styles.textInput}
+          placeholder="Name"
+          onChangeText={(name) => setEmail(name)}
+          value={name}
+        />
         <TextInput
           style={styles.textInput}
           placeholder="Email"

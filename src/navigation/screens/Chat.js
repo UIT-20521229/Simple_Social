@@ -5,9 +5,6 @@ import {
   Button, Image,
   View, StyleSheet
 } from "react-native";
-import firestore from "firebase/firestore";
-import { signOut } from "firebase/auth";
-import { auth, database } from "../../../config";
 import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
 import { sendMessage } from "../../redux/slices/messageSlice";
@@ -35,8 +32,6 @@ export default function Chat() {
   };
 
   const onSignOut = () => {
-    signOut(auth)
-      .catch((error) => console.log(error));
   };
 
   useLayoutEffect(() => {
@@ -50,18 +45,6 @@ export default function Chat() {
   }, [navigation]);
 
   useLayoutEffect(() => {
-    firestore().collection(database, 'chats').onSnapshot((snapshot) => {
-      const category = []
-
-      snapshot.forEach(documentSnapshot => {
-        category.push({
-          ...documentSnapshot.data(),
-          key: documentSnapshot.id
-        })
-      })
-      setCategory(category)
-    })
-    return () => chats()
   }, [])
 
   const onSend = useCallback(async (messages = []) => {
@@ -104,9 +87,7 @@ export default function Chat() {
         key={user => user._id}
         messages={message}
         onSend={messages => onSend(messages)}
-        user={{
-          _id: auth?.currentUser?.email,
-        }}
+        user={{'_id': 1, 'name': 'User Test'}}
         renderSend={(props) => (
           <View
             style={{ flexDirection: 'row', alignItems: 'center', height: 60 }}>

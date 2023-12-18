@@ -13,7 +13,7 @@ app.use('/api', routes)
 
 const bodyParser = require('body-parser');
 const mongoString = dbURL;
-mongoose.connect(mongoString)
+mongoose.connect(mongoString, { useNewUrlParser: true, useUnifiedTopology: true })
 
 const database = mongoose.connection;
 database.on('error', (error) => {
