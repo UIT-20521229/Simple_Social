@@ -16,10 +16,25 @@ const UserSchema = new mongoose.Schema({
     avatar: {
         type: Buffer,
     },
-    role: {
-        required: true,
-        type: String,
-    },
+    friendRequest: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'users'
+        }
+    ],
+    friends: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'users'
+        }
+    ],
+    sendFriendRequest: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'users'
+        }
+    ],
 })
 
-module.exports = mongoose.model('users', UserSchema);
+const users = mongoose.model('users', UserSchema);
+module.exports = users;

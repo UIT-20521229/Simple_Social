@@ -1,49 +1,103 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  Alert, StyleSheet, Image,
-  Text, Button, TextInput, View, SafeAreaView
+  Alert, StyleSheet, Image, TouchableOpacity,
+  Text, Button, TextInput, View, SafeAreaView,
+  KeyboardAvoidingView, Pressable, ImageBackground, StatusBar
 } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import axios from "axios";
-// const backImage = require("../assets/background.jpg");
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch } from "react-redux";
+import { setUserId } from "../../redux/slices/userSlice";
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  useEffect(() => {
+    const getUser = async () => {
+      const token = await AsyncStorage.getItem("token");
+      if (token) {
+        navigation.navigate("Home");
+      } else return;
+    };
+    getUser();
+  }, []);
+
   const onHandleLogin = async () => {
-    await axios.get("http://localhost:3200/api/getAllUsers")
-      .then(res => {
-        console.log(res);
-        console.log(res.data);
+    const user = {
+      email: email,
+      password: password,
+    };
+
+    await axios.post("http://26.88.95.239:3200/api/login", user)
+      .then(async (response) => {
+        console.log(response);
+        const token = response.data.token;
+        await AsyncStorage.setItem("token", token);
+        navigation.replace("Home");
       })
-      .catch(err => console.log(err))
+      .catch((error) => {
+        Alert.alert(
+          "Login Error",
+          "An error occurred while logging in"
+        );
+        console.log("login failed", error);
+      });
   };
+
   return (
-    <View stlye={styles.container}>
-      <SafeAreaView>
-        <Text style={styles.text}>Đăng nhập</Text>
-        <TextInput
-          style={styles.textInput}
-          placeholder="Email"
-          onChangeText={(email) => setEmail(email)}
-          value={email}
-        />
-        <TextInput
-          style={styles.textInput}
-          placeholder="Mật khẩu"
-          onChangeText={(password) => setPassword(password)}
-          value={password}
-          secureTextEntry={true}
-        />
-        <Button title="Đăng nhập" onPress={onHandleLogin} />
-        <View style={styles.notAccountYet}>
-          <Text style={{ color: "black" }}>Bạn chưa có tài khoản?</Text>
-          <TouchableOpacity onPress={() => navigation.navigate("Signup")} >
-            <Text style={{ color: "black", fontWeight: "bold" }}> Đăng ký</Text>
-          </TouchableOpacity>
+    <View style={styles.container}>
+      <KeyboardAvoidingView
+        behavior="position"
+        contentContainerStyle={styles.container}
+        keyboardVerticalOffset={-100}
+      >
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>Sign In</Text>
+          <Text style={styles.subtitle}>Sign In to Your Account</Text>
         </View>
-      </SafeAreaView>
+
+        <View style={styles.formContainer}>
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Email</Text>
+            <TextInput
+              value={email}
+              onChangeText={(text) => setEmail(text)}
+              style={styles.input}
+              placeholderTextColor={"black"}
+              placeholder="Enter Your Email"
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Password</Text>
+            <TextInput
+              value={password}
+              onChangeText={(text) => setPassword(text)}
+              secureTextEntry={true}
+              style={styles.input}
+              placeholderTextColor={"black"}
+              placeholder="Password"
+            />
+          </View>
+
+          <Pressable
+            onPress={onHandleLogin}
+            style={styles.loginButton}
+          >
+            <Text style={styles.loginButtonText}>Login</Text>
+          </Pressable>
+
+          <Pressable
+            onPress={() => navigation.navigate("Signup")}
+            style={styles.signupButton}
+          >
+            <Text style={styles.signupButtonText}>
+              Don't have an account? Sign Up
+            </Text>
+          </Pressable>
+        </View>
+      </KeyboardAvoidingView>
     </View>
   );
 }
@@ -51,40 +105,64 @@ export default function Login({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "white",
+    padding: StatusBar.currentHeight,  
     alignItems: "center",
-    justifyContent: "center",
   },
-  text: {
-    fontSize: 30,
-    fontWeight: "bold",
-    color: "black",
-    alignSelf: "center",
+  titleContainer: {
+    marginTop: 100,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  title: {
+    color: "#4A55A2",
+    fontSize: 17,
+    fontWeight: "600",
+  },
+  subtitle: {
+    fontSize: 17,
+    fontWeight: "600",
+    marginTop: 15,
+  },
+  formContainer: {
     marginTop: 50,
   },
-  textInput: {
-    height: 50,
-    width: 300,
-    borderWidth: 1,
-    borderRadius: 10,
-    marginTop: 20,
-    paddingLeft: 10,
+  inputContainer: {
+    marginBottom: 10,
   },
-  button: {
-    height: 50,
-    width: 300,
-    backgroundColor: "blue",
-    borderRadius: 10,
-    marginTop: 20,
-    alignItems: "center",
-    justifyContent: "center",
+  label: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "gray",
   },
-  textButton: {
-    fontSize: 20,
-    fontWeight: "bold",
+  input: {
+    fontSize: 18,
+    borderBottomColor: "gray",
+    borderBottomWidth: 1,
+    marginVertical: 10,
+    width: 300,
+  },
+  loginButton: {
+    width: 200,
+    backgroundColor: "#4A55A2",
+    padding: 15,
+    marginTop: 50,
+    marginLeft: "auto",
+    marginRight: "auto",
+    borderRadius: 6,
+  },
+  loginButtonText: {
     color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
   },
-  notAccountYet: {
-    flexDirection: "row",
-    marginTop: 20,
+  signupButton: {
+    marginTop: 15,
+  },
+  signupButtonText: {
+    textAlign: "center",
+    color: "gray",
+    fontSize: 16,
   },
 });

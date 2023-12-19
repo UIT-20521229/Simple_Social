@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useLayoutEffect, useCallback } from "react";
 import { GiftedChat, Bubble, Send } from "react-native-gifted-chat";
 import {
-  TouchableOpacity, Text,
-  Button, Image,
+  TouchableOpacity, Text, Button, Image,
   View, StyleSheet
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
 import { sendMessage } from "../../redux/slices/messageSlice";
+import { setUserId } from "../../redux/slices/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Icon from "react-native-vector-icons/FontAwesome";
-// Firebase Storage to upload file
+
 import * as DocumentPicker from "expo-document-picker";
-import * as FileSystem from "expo-file-system";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Chat() {
   const { message } = useSelector(state => state.message);
@@ -32,6 +32,7 @@ export default function Chat() {
   };
 
   const onSignOut = () => {
+    dispatch(setUserId(null));
   };
 
   useLayoutEffect(() => {
@@ -43,9 +44,6 @@ export default function Chat() {
       ),
     });
   }, [navigation]);
-
-  useLayoutEffect(() => {
-  }, [])
 
   const onSend = useCallback(async (messages = []) => {
     const msg = messages[0];
@@ -87,7 +85,7 @@ export default function Chat() {
         key={user => user._id}
         messages={message}
         onSend={messages => onSend(messages)}
-        user={{'_id': 1, 'name': 'User Test'}}
+        user={{ '_id': 1, 'name': 'User Test' }}
         renderSend={(props) => (
           <View
             style={{ flexDirection: 'row', alignItems: 'center', height: 60 }}>

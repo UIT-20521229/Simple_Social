@@ -1,28 +1,27 @@
 const express = require('express');
 const mongoose = require('mongoose');
-require('dotenv').config();
-
-const port = process.env.DATABASE_PORT;
-const dbURL = process.env.DATABASE_URL;
-
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const passport = require('passport');
+const LocalStragety = require('passport-local').Strategy;
 const app = express();
+
+const port = 3200;
+const dbURL = 'mongodb+srv://duy777:duy777@cluster0.5gxf74l.mongodb.net/';
+
 const routes = require('./routes/routes');
 
-app.use(express.json());
+app.use(cors());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(passport.initialize());
+
 app.use('/api', routes)
 
-const bodyParser = require('body-parser');
 const mongoString = dbURL;
-mongoose.connect(mongoString, { useNewUrlParser: true, useUnifiedTopology: true })
-
-const database = mongoose.connection;
-database.on('error', (error) => {
-    console.log(error)
-})
-
-database.once('connected', () => {
-    console.log('Database Connected');
-})
+mongoose.connect(mongoString)
+    .then(() => console.log('MongoDB Connected'))
+    .catch(err => console.log(err))
 
 app.listen(port, () => {
     console.log(`Server Started at ${port}`)
