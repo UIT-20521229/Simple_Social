@@ -13,12 +13,18 @@ import axios from 'axios';
 import { User } from '../../components/index';
 global.atob = decode;
 
-export default Home = ({ navigation }) => {
+
+export default function Home({ navigation }) {
     const { users, userId, userLoading } = useSelector(state => state.user);
     const dispatch = useDispatch();
 
     const handleLogOut = async () => {
-        fetchUser()
+        try {
+            await AsyncStorage.removeItem('token')
+            navigation.navigate("Login")
+        } catch (error) {
+            console.log("error:", error)
+        }s
     }
 
     useLayoutEffect(() => {
@@ -26,13 +32,16 @@ export default Home = ({ navigation }) => {
             headerTitle: "",
             headerLeft: () => (
                 <View style={{ marginLeft: 20 }}>
-                    <Text>Chat</Text>
+                    <Text>Fake</Text>
                 </View>
             ),
             headerRight: () => (
                 <View style={styles.buttonHeader}>
-                    <TouchableOpacity >
+                    <TouchableOpacity onPress={() => navigation.navigate("Chat")}>
                         <Icon name="message-processing-outline" size={30} />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate("Friends")}>
+                        <Icon name="account-group-outline" size={30} />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={handleLogOut}>
                         <Icon name="logout" size={30} />
@@ -49,7 +58,7 @@ export default Home = ({ navigation }) => {
         dispatch(setUserId(userId))
         console.log("userId:", userId)
 
-        axios.get(`http://26.88.95.239:3200/api/users/${userId}`)
+        axios.get(`http://10.45.117.190:3200/api/users/${userId}`)
             .then(res => {
                 console.log("res:", res)
                 dispatch(setUsers(res.data))
@@ -58,30 +67,28 @@ export default Home = ({ navigation }) => {
                 console.log("err:", err)
             })
     }
-    
+
     useEffect(() => {
         fetchUser()
     }, [])
 
-        return (
-            <View style={styles.container}>
-                {users ? users.map((item, index) => (
-                    <User key={index} item={item} />
-                )) : <ActivityIndicator></ActivityIndicator>}
-            </View>
-        )
+    return (
+        <View style={styles.container}>
+            {users ? users.map((item, index) => (
+                <User key={index} item={item} />
+            )) : <ActivityIndicator style={{ flex: 1 }}></ActivityIndicator>}
+        </View>
+    )
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
     },
     buttonHeader: {
         flexDirection: "row",
         justifyContent: "space-between",
-        width: 80,
+        width: 130,
         marginRight: 5,
     },
 })

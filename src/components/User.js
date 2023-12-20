@@ -3,64 +3,23 @@ import { StyleSheet, Text, View, Pressable, Image } from "react-native";
 import { setUsers, setUserId } from '../redux/slices/userSlice';
 import { useDispatch, useSelector } from 'react-redux'
 
-export default User = ({ item }) => {
-  const { userId, setUserId } = useSelector(state => state.user);
+export default function User({ item }) {
+  const { userId, users } = useSelector(state => state.user);
   const [requestSent, setRequestSent] = useState(false);
   const [friendRequests, setFriendRequests] = useState([]);
   const [userFriends, setUserFriends] = useState([]);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    const fetchFriendRequests = async () => {
-      try {
-        const response = await fetch(
-          `http://26.88.95.239:3200/api/friend-requests/sent/${userId}`
-        );
-
-        const data = await response.json();
-        if (response.ok) {
-          setFriendRequests(data);
-        } else {
-          console.log("error", response.status);
-        }
-      } catch (error) {
-        console.log("error", error);
-      }
-    };
-
-    fetchFriendRequests();
-  }, []);
-
-  useEffect(() => {
-    const fetchUserFriends = async () => {
-      try {
-        const response = await fetch(`http://26.88.95.239:3200/api/friends/${userId}`);
-
-        const data = await response.json();
-
-        if (response.ok) {
-          setUserFriends(data);
-        } else {
-          console.log("error retrieving user friends", response.status);
-        }
-      } catch (error) {
-        console.log("Error message", error);
-      }
-    };
-
-    fetchUserFriends();
-  }, []);
-
   const sendFriendRequest = async (currentUserId, selectedUserId) => {
+    console.log("send friend request response");
     try {
-      const response = await fetch("http://26.88.95.239:3200/api/friend-request", {
+      const response = await fetch("http://10.45.117.190:3200/api/friend-request", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ currentUserId, selectedUserId }),
       });
-
       if (response.ok) {
         setRequestSent(true);
       }
@@ -69,13 +28,8 @@ export default User = ({ item }) => {
     }
   };
 
-  console.log("friend requests sent", friendRequests);
-  console.log("user friends", userFriends);
-
   return (
-    <Pressable
-      style={styles.container}
-    >
+    <Pressable style={styles.container}>
       <View>
         <Image
           style={styles.image}
@@ -89,15 +43,11 @@ export default User = ({ item }) => {
       </View>
 
       {userFriends.includes(item._id) ? (
-        <Pressable
-          style={styles.buttonFriends}
-        >
+        <Pressable style={styles.buttonFriends}>
           <Text style={styles.buttonText}>Friends</Text>
         </Pressable>
       ) : requestSent || friendRequests.some((friend) => friend._id === item._id) ? (
-        <Pressable
-          style={styles.buttonRequestSent}
-        >
+        <Pressable style={styles.buttonRequestSent}>
           <Text style={styles.buttonText}>Request Sent</Text>
         </Pressable>
       ) : (

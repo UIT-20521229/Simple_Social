@@ -21,7 +21,7 @@ export default function Signup({ navigation }) {
       avatar: avatar,
     }
 
-    await axios.post("http://26.88.95.239:3200/api/register", user)
+    await axios.post("http://192.168.1.3:3200/api/register", user)
       .then((response) => {
         console.log(response);
         Alert.alert(
