@@ -77,7 +77,7 @@ router.post("/friend-request", async (req, res) => {
 
     try {
         await users.findByIdAndUpdate(selectedUserId, {
-            friendRequest: currentUserId ,
+            friendRequest: currentUserId,
         });
 
         await users.findByIdAndUpdate(currentUserId, {
@@ -143,11 +143,11 @@ const upload = multer({ storage: storage });
 //endpoint to post Messages and store it in the backend
 router.post("/messages", upload.single("imageFile"), async (req, res) => {
     try {
-        const { sendId, recieveId, messageType, messageText } = req.body;
+        const { sendId, receiveId, messageType, messageText } = req.body;
 
         const newMessage = new messages({
             sendId,
-            recieveId,
+            receiveId,
             messageType,
             message: messageText,
             timestamp: new Date(),
@@ -168,9 +168,9 @@ router.get("/user/:userId", async (req, res) => {
         const { userId } = req.params;
 
         //fetch the user data from the user ID
-        const recepientId = await users.findById(userId);
+        const receiveId = await users.findById(userId);
 
-        res.json(recepientId);
+        res.json(receiveId);
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: "Internal Server Error" });
@@ -178,14 +178,14 @@ router.get("/user/:userId", async (req, res) => {
 });
 
 //endpoint to fetch the messages between two users in the chatRoom
-router.get("/messages/:senderId/:recepientId", async (req, res) => {
+router.get("/messages/:sendId/:receiveId", async (req, res) => {
     try {
-        const { sendId, recieveId } = req.params;
+        const { sendId, receiveId } = req.params;
 
         const messages = await messages.find({
             $or: [
-                { sendId: sendId, recieveId: recieveId },
-                { sendId: recieveId, recepientId: sendId },
+                { sendId: sendId, receiveId: receiveId },
+                { sendId: receiveId, receiveId: sendId },
             ],
         }).populate("sendId", "_id name");
 
