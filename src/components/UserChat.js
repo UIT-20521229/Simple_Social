@@ -1,30 +1,29 @@
 import { StyleSheet, Text, View, Pressable, Image } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, memo } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { setUsers, setUserId } from '../redux/slices/userSlice';
 import { useDispatch, useSelector } from 'react-redux'
 
-
-export default function UserChat({ item }) {
+function UserChat({ item }) {
     const { userId } = useSelector(state => state.user);
     const [messages, setMessages] = useState([]);
     const navigation = useNavigation();
 
     const fetchMessages = async () => {
-        try {
-            const response = await fetch(
-                `http://192.168.1.3:3200/messages/${userId}/${item._id}`
-            );
-            const data = await response.json();
+        // try {
+        //     const response = await fetch(
+        //         `http://${IP}:3200/messages/${userId}/${item._id}`
+        //     );
+        //     const data = await response.json();
 
-            if (response.ok) {
-                setMessages(data);
-            } else {
-                console.log("error showing messags", response.status.message);
-            }
-        } catch (error) {
-            console.log("error fetching messages", error);
-        }
+        //     if (response.ok) {
+        //         setMessages(data);
+        //     } else {
+        //         console.log("error showing messags", response.status.message);
+        //     }
+        // } catch (error) {
+        //     console.log("error fetching messages", error);
+        // }
     };
 
     useEffect(() => {
@@ -50,8 +49,8 @@ export default function UserChat({ item }) {
     return (
         <Pressable
             onPress={() =>
-                navigation.navigate("Messages", {
-                    recepientId: item._id,
+                navigation.navigate("Message", {
+                    receiveId: item._id,
                 })
             }
             style={styles.container}
@@ -115,3 +114,5 @@ const styles = StyleSheet.create({
         color: "#585858",
     },
 });
+
+export default memo(UserChat);  

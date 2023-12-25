@@ -2,6 +2,7 @@ import { useContext, useState, useEffect } from "react";
 import { StyleSheet, Text, View, Pressable, Image } from "react-native";
 import { setUsers, setUserId } from '../redux/slices/userSlice';
 import { useDispatch, useSelector } from 'react-redux'
+import { IP } from "@env";
 
 export default function User({ item }) {
   const { userId, users } = useSelector(state => state.user);
@@ -10,10 +11,30 @@ export default function User({ item }) {
   const [userFriends, setUserFriends] = useState([]);
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    const fetchUserFriends = async () => {
+      try {
+        const response = await fetch(`http://${IP}:3200/api/friends/${userId}`);
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setUserFriends(data);
+        } else {
+          console.log("error retrieving user friends", response.status);
+        }
+      } catch (error) {
+        console.log("Error message", error);
+      }
+    };
+
+    fetchUserFriends();
+  }, [userFriends]);
+
   const sendFriendRequest = async (currentUserId, selectedUserId) => {
     console.log("send friend request response");
     try {
-      const response = await fetch("http://10.45.117.190:3200/api/friend-request", {
+      const response = await fetch(`http://${IP}:3200/api/friend-request`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

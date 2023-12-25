@@ -11,20 +11,16 @@ import { jwtDecode } from 'jwt-decode';
 import { decode } from "base-64";
 import axios from 'axios';
 import { User } from '../../components/index';
+import { IP } from "@env";
 global.atob = decode;
-
 
 export default function Home({ navigation }) {
     const { users, userId, userLoading } = useSelector(state => state.user);
     const dispatch = useDispatch();
 
     const handleLogOut = async () => {
-        try {
-            await AsyncStorage.removeItem('token')
-            navigation.navigate("Login")
-        } catch (error) {
-            console.log("error:", error)
-        }s
+        await AsyncStorage.removeItem('token')
+        navigation.navigate("Login")
     }
 
     useLayoutEffect(() => {
@@ -51,24 +47,23 @@ export default function Home({ navigation }) {
         })
     }, [navigation])
 
-    const fetchUser = async () => {
-        const token = await AsyncStorage.getItem('token')
-        const decodeToken = jwtDecode(token)
-        const userId = decodeToken.userId
-        dispatch(setUserId(userId))
-        console.log("userId:", userId)
-
-        axios.get(`http://10.45.117.190:3200/api/users/${userId}`)
-            .then(res => {
-                console.log("res:", res)
-                dispatch(setUsers(res.data))
-            })
-            .catch(err => {
-                console.log("err:", err)
-            })
-    }
 
     useEffect(() => {
+        const fetchUser = async () => {
+            const token = await AsyncStorage.getItem('token')
+            const decodeToken = jwtDecode(token)
+            const userId = decodeToken.userId
+            dispatch(setUserId(userId))
+
+            axios.get(`http://${IP}:3200/api/users/${userId}`)
+                .then(res => {
+                    console.log("res:", res)
+                    dispatch(setUsers(res.data))
+                })
+                .catch(err => {
+                    console.log("err:", err)
+                })
+        }
         fetchUser()
     }, [])
 

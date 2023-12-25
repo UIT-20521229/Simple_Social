@@ -5,8 +5,8 @@ const Stack = createStackNavigator();
 
 export default function ChatStack() {
     return (
-        <Stack.Navigator initialRouteName='Message'>
-            <Stack.Screen name="Chat" component={Chat} />
+        <Stack.Navigator>
+            <Stack.Screen name="Chats" component={Chat} />
             <Stack.Screen name="Message" component={ChatMessage} />
         </Stack.Navigator>
     )

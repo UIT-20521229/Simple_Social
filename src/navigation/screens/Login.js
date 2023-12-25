@@ -4,6 +4,7 @@ import {
   Text, Button, TextInput, View, SafeAreaView,
   KeyboardAvoidingView, Pressable, ImageBackground, StatusBar
 } from "react-native";
+import { IP } from "@env";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -27,7 +28,7 @@ export default function Login({ navigation }) {
       password: password,
     };
 
-    await axios.post("http://10.45.117.190:3200/api/login", user)
+    await axios.post(`http://${IP}:3200/api/login`, user)
       .then(async (response) => {
         console.log(response);
         const token = response.data.token;
@@ -104,7 +105,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
-    padding: StatusBar.currentHeight,  
+    padding: StatusBar.currentHeight,
     alignItems: "center",
   },
   titleContainer: {

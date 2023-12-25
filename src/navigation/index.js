@@ -5,8 +5,7 @@ import ChatStack from './stacks/ChatStack';
 export default function RootNavigator() {
     return (
         <NavigationContainer>
-            {/* <AuthStack /> */}
-            <ChatStack />
+            <AuthStack />
         </NavigationContainer>
     )
 }

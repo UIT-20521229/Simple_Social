@@ -35,8 +35,6 @@ const createToken = (userId) => {
 }
 
 router.post('/login', (req, res) => {
-    const count = 0;
-    console.log("go login", () => { count++ })
     const { email, password } = req.body;
     //check if email and password entered
     if (!email || !password) {
@@ -96,17 +94,58 @@ router.get("/friend-request/:userId", async (req, res) => {
 
         //fetch the user document based on the User id
         const user = await users.findById(userId)
-            .populate("friend request:", "name email image")
+            .populate("friendRequest", "name email image")
             .lean();
 
-        const friendRequest = users.friendRequest;
-
+        const friendRequest = user.friendRequest;
         res.json(friendRequest);
+
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Internal Server Error" });
     }
 });
+
+router.post("/friend-request/accept", async (req, res) => {
+    try {
+        const { sendId, receiveId } = req.body;
+
+        //retrieve the documents of sender and the recipient
+        const sender = await users.findById(sendId);
+        const recepient = await users.findById(receiveId);
+
+        sender.friends.push(receiveId);
+        recepient.friends.push(sendId);
+
+        recepient.friendRequest = recepient.friendRequest.filter(
+            (request) => request.toString() !== sendId.toString()
+        );
+
+        sender.sendFriendRequest = sender.sendFriendRequest.filter(
+            (request) => request.toString() !== receiveId.toString
+        );
+
+        await sender.save();
+        await recepient.save();
+
+        res.status(200).json({ message: "Friend Request accepted successfully" });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
+
+router.get("/friends/:userId", async (req, res) => {
+    const user = req.params.userId;
+    users.findById(user)
+        .then(user => {
+            res.status(200).json(user.friends);
+        })
+        .catch(err => {
+            console.log("Error retrieving user friends", err);
+            res.status(500).json({ message: "Server error!!!" })
+        });
+})
 
 router.get("/accepted-friends/:userId", async (req, res) => {
     try {
@@ -141,21 +180,22 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 //endpoint to post Messages and store it in the backend
-router.post("/messages", upload.single("imageFile"), async (req, res) => {
+router.post("/messages", upload.single('imageFile'), async (req, res) => {
     try {
-        const { sendId, receiveId, messageType, messageText } = req.body;
+        const { _id, text, user, image, video, createdAt, receiveId } = req.body;
 
         const newMessage = new messages({
-            sendId,
+            text,
+            user,
+            image: image ? image.file.path : '',
+            video: video ? video : '',
+            createdAt: new Date(),
             receiveId,
-            messageType,
-            message: messageText,
-            timestamp: new Date(),
-            imageUrl: messageType === "image" ? req.file.path : null,
         });
 
         await newMessage.save();
         res.status(200).json({ message: "Message sent Successfully" });
+
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: "Internal Server Error" });
@@ -182,14 +222,17 @@ router.get("/messages/:sendId/:receiveId", async (req, res) => {
     try {
         const { sendId, receiveId } = req.params;
 
-        const messages = await messages.find({
+        const message = await messages.find({
             $or: [
-                { sendId: sendId, receiveId: receiveId },
-                { sendId: receiveId, receiveId: sendId },
+                { user: sendId, receiveId: receiveId },
+                { user: receiveId, receiveId: sendId },
             ],
-        }).populate("sendId", "_id name");
+        }).populate("user", "name email image")
+            .select("-__v")
+            .sort({ createdAt: 'desc' });
 
-        res.json(messages);
+        res.json(message);
+
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: "Internal Server Error" });

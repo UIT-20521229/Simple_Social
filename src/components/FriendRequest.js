@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View, Pressable, Image } from "react-native";
-import React, { useContext } from "react";
+import { IP } from "@env";
+import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { setUserId } from "../redux/slices/userSlice";
 import { useSelector, useDispatch } from "react-redux";
@@ -12,15 +13,15 @@ const FriendRequest = ({ item, friendRequests, setFriendRequests }) => {
     const acceptRequest = async (friendRequestId) => {
         try {
             const response = await fetch(
-                "http://192.168.1.3:3200/friend-request/accept",
+                `http://${IP}:3200/api/friend-request/accept`,
                 {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        senderId: friendRequestId,
-                        recepientId: userId,
+                        sendId: friendRequestId,
+                        receiveId: userId,
                     }),
                 }
             );
@@ -29,7 +30,7 @@ const FriendRequest = ({ item, friendRequests, setFriendRequests }) => {
                 setFriendRequests(
                     friendRequests.filter((request) => request._id !== friendRequestId)
                 );
-                navigation.navigate("Chats");
+                navigation.goBack();
             }
         } catch (err) {
             console.log("error acceptin the friend request", err);

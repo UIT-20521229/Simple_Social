@@ -12,10 +12,11 @@ export const messageSlice = createSlice({
         sendMessage(state, action) {
             state.message = GiftedChat.append(state.message, action.payload)
         },
-    }, 
+        reset: state => initialState,
+    },
 })
 
 // Action creators are generated for each case reducer function
-export const { sendMessage } = messageSlice.actions
+export const { sendMessage, reset } = messageSlice.actions
 
 export default messageSlice.reducer

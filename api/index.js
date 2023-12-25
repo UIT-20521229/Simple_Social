@@ -9,7 +9,7 @@ const app = express();
 const port = 3200;
 const dbURL = 'mongodb+srv://duy777:duy777@cluster0.5gxf74l.mongodb.net/';
 
-require('dotenv').config();   
+require('dotenv').config();
 
 const routes = require('./routes/routes');
 

@@ -1,18 +1,20 @@
 import { StyleSheet, Text, View, ScrollView, Pressable } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { UserChat } from "../../../components/index";
+import { IP } from "@env";
 
 export default function ChatsScreen() {
   const [acceptedFriends, setAcceptedFriends] = useState([]);
+  const { userId } = useSelector((state) => state.user);
 
   const navigation = useNavigation();
 
   useEffect(() => {
     const acceptedFriendsList = async () => {
       try {
-        const response = await fetch(`http://192.168.1.3:3200/api/accepted-friends/${userId}`);
+        const response = await fetch(`http://${IP}:3200/api/accepted-friends/${userId}`);
 
         const data = await response.json();
 

@@ -1,28 +1,27 @@
 const mongoose = require('mongoose');
 
 const messageSchema = new mongoose.Schema({
-    sendId: {
+    text: {
+        type: String,
+    },
+    user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'users'
+        ref: "users"
+    },
+    image: {
+        type: String,
+    },
+    video: {
+        type: String,
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
     },
     receiveId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'users'
+        ref: "users"
     },
-    messageType: {
-        type: String,
-        enum: ["text", "image", "video", "audio", "file"]
-    },
-    message: {
-        type: String,
-    },
-    imageUrl: {
-        type: String,
-    },
-    timeStamps: {
-        type: Date,
-        default: Date.now
-    }
 })
 
 const messages = mongoose.model('messages', messageSchema);
