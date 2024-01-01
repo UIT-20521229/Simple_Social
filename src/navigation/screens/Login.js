@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Alert, StyleSheet, Image, TouchableOpacity,
   Text, Button, TextInput, View, SafeAreaView,
@@ -12,17 +12,7 @@ export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  useEffect(() => {
-    const getUser = async () => {
-      const token = await AsyncStorage.getItem("token");
-      if (token) {
-        navigation.navigate("Home");
-      } else return;
-    };
-    getUser();
-  }, []);
-
-  const onHandleLogin = async () => {
+  const onHandleLogin = useCallback(async () => {
     const user = {
       email: email,
       password: password,
@@ -42,7 +32,7 @@ export default function Login({ navigation }) {
         );
         console.log("login failed", error);
       });
-  };
+  })
 
   return (
     <View style={styles.container}>
@@ -80,12 +70,12 @@ export default function Login({ navigation }) {
             />
           </View>
 
-          <Pressable
+          <TouchableOpacity
             onPress={onHandleLogin}
             style={styles.loginButton}
           >
             <Text style={styles.loginButtonText}>Login</Text>
-          </Pressable>
+          </TouchableOpacity>
 
           <Pressable
             onPress={() => navigation.navigate("Signup")}

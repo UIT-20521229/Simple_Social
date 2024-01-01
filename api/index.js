@@ -16,6 +16,7 @@ const routes = require('./routes/routes');
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(express.static('files'));
 app.use(passport.initialize());
 
 app.use('/api', routes)
@@ -25,6 +26,7 @@ mongoose.connect(mongoString)
     .then(() => console.log('MongoDB Connected'))
     .catch(err => console.log(err))
 
-app.listen(port, () => {
+app.listen(3200, () => {
     console.log(`Server Started at ${port}`)
-})
+});
+

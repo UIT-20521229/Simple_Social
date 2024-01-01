@@ -9,68 +9,79 @@ import { sendMessage, reset } from '../../../redux/slices/messageSlice'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import * as ImagePicker from 'expo-image-picker';
 import 'react-native-get-random-values';
+import { v4 as uuid } from 'uuid';
 
 export default function ChatMessage() {
     const navigation = useNavigation()
     const dispatch = useDispatch()
     const route = useRoute()
+
     const { message } = useSelector(state => state.message)
     const { receiveId } = route.params
     const { userId } = useSelector(state => state.user)
-    const [imageUrl, setImageUrl] = useState('')
-    const [videoUrl, setVideoUrl] = useState('')
+    const [image, setImage] = useState('')
+
+    useEffect(() => {
+        navigation.getParent()?.setOptions({ tabBarStyle: { display: 'none' } });
+    }, [navigation])
 
     useEffect(() => {
         dispatch(reset())
-        const fetchMessages = async () => {
-            try {
-                const response = await fetch(`http://${IP}:3200/api/messages/${userId}/${receiveId}`)
-                const data = await response.json();
-                if (data) {
-                    dispatch(sendMessage(data))
-                }
-            } catch (error) {
-                console.log("error fetching messages", error);
-            }
+        const fetchMessages = () => {
+            axios.get(`http://${IP}:3200/api/messages/${userId}/${receiveId}`)
+                .then(res => {
+                    dispatch(sendMessage(res.data))
+                })
+                .catch(err => console.log(err))
         }
         fetchMessages()
     }, [])
 
-    const onSend = useCallback(async (messages = []) => {
+    const onSend = async (messages = []) => {
         const msg = messages[0]
-
         const myMsg = {
-            _id: msg._id,
+            _id: msg._id || uuid(),
             text: msg.text,
             user: msg.user,
-            image: imageUrl || '',
-            video: videoUrl || '',
+            image: image.uri || '',
             createdAt: new Date().toISOString(),
             receiveId: receiveId
         }
+        console.log("myMsg", myMsg)
         try {
-            await axios.post(`http://${IP}:3200/api/messages`, myMsg)
+            const data = new FormData()
+            data.append('text', myMsg.text)
+            data.append('user', myMsg.user._id)
+            data.append('image', {
+                uri: image.uri,
+                type: `${image.type}/jpeg`,
+                name: 'image.jpg'
+            } || null);
+            data.append('receiveId', myMsg.receiveId)
+            console.log("data", data._parts)
+            const respone = await axios.post(`http://${IP}:3200/api/messages`, data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
             dispatch(sendMessage(myMsg))
+            setImage('')
+            console.log(respone.data)
         } catch (error) {
-            console.log(error)
+            console.log(error.status.message)
         }
-    }, [message])
+    }
 
     const chooseImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
             aspect: [4, 3],
             quality: 1,
         });
-        console.log(result.assets[0])
 
         if (!result.canceled) {
-            if (result.assets[0].type === 'video') {
-                setVideoUrl(result.assets[0].uri)
-            } else {
-                setImageUrl(result.assets[0].uri)
-            }
+            setImage(result.assets[0]);
         }
     };
 
@@ -121,7 +132,6 @@ export default function ChatMessage() {
     }
 
     return (
-
         <View style={styles.container}>
             <GiftedChat
                 messages={message}
@@ -133,6 +143,19 @@ export default function ChatMessage() {
                 renderSend={renderSend}
                 renderBubble={renderBubble}
                 renderActions={renderLeftIcon}
+                renderMessageImage={props => {
+                    const imageUri = props.currentMessage.image;
+                    const fileName = imageUri.split('\\').pop().split('/').pop();
+                    return (
+                        <Image
+                            {...props}
+                            source={{ uri: `http://${IP}:3200/${fileName}` }}
+                            style={{ width: 150, height: 100 }}
+                            borderTopLeftRadius={10}
+                            borderTopRightRadius={10}
+                        />
+                    );
+                }}
             />
         </View>
 

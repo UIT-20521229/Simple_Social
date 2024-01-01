@@ -1,8 +1,13 @@
-import { StyleSheet, Text, View, ScrollView, Pressable } from "react-native";
-import { useEffect, useState } from "react";
+import {
+  StyleSheet, Text, View,
+  ScrollView, Pressable, StatusBar,
+  TouchableOpacity
+} from "react-native";
+import { useEffect, useState, useLayoutEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { UserChat } from "../../../components/index";
+import { Header as HeaderRNE, HeaderProps, Icon } from '@rneui/themed'
 import { IP } from "@env";
 
 export default function ChatsScreen() {
@@ -32,14 +37,46 @@ export default function ChatsScreen() {
   console.log("friends", acceptedFriends)
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
-      <Pressable>
+    <View style={styles.container}>
+      <HeaderRNE
+        leftComponent={{
+          icon: 'menu',
+          color: '#fff',
+          onPress: () => navigation.toggleDrawer(),
+        }}
+        rightComponent={
+          <View style={styles.headerRight}>
+            <TouchableOpacity>
+              <Icon name="search" color="white" />
+            </TouchableOpacity>
+          </View>
+        }
+        centerComponent={{ style: styles.header }}
+      />
+      <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
         {acceptedFriends.map((item, index) => (
           <UserChat key={index} item={item} />
         ))}
-      </Pressable>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    marginTop: StatusBar.currentHeight || 0,
+  },
+  header: {
+    paddingHorizontal: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    color: 'white',
+    fontSize: 22,
+    fontWeight: 'bold',
+  },
+  scrollView: {
+    flex: 1,
+    marginHorizontal: 20,
+  },
+});

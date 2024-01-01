@@ -2,6 +2,7 @@ import { useContext, useState, useEffect } from "react";
 import { StyleSheet, Text, View, Pressable, Image } from "react-native";
 import { setUsers, setUserId } from '../redux/slices/userSlice';
 import { useDispatch, useSelector } from 'react-redux'
+import { ListItem, Avatar } from "@rneui/themed";
 import { IP } from "@env";
 
 export default function User({ item }) {
@@ -50,36 +51,40 @@ export default function User({ item }) {
   };
 
   return (
-    <Pressable style={styles.container}>
-      <View>
-        <Image
-          style={styles.image}
-          source={{ uri: item.image }}
+    <ListItem style={styles.container} bottomDivider>
+        <Avatar
+          size={20}
+          rounded
+          source={{ uri: 'https://www.w3schools.com/howto/img_avatar.png' }}
         />
-      </View>
+        <ListItem.Content>
+          <ListItem.Title>
+            <Text style={styles.name}>{item?.name}</Text>
+          </ListItem.Title>
+          <ListItem.Subtitle>
+            <Text style={styles.email}>{item?.email}</Text>
+          </ListItem.Subtitle>
+        </ListItem.Content>
 
-      <View style={styles.userInfo}>
-        <Text style={styles.name}>{item?.name}</Text>
-        <Text style={styles.email}>{item?.email}</Text>
-      </View>
-
-      {userFriends.includes(item._id) ? (
-        <Pressable style={styles.buttonFriends}>
-          <Text style={styles.buttonText}>Friends</Text>
-        </Pressable>
-      ) : requestSent || friendRequests.some((friend) => friend._id === item._id) ? (
-        <Pressable style={styles.buttonRequestSent}>
-          <Text style={styles.buttonText}>Request Sent</Text>
-        </Pressable>
-      ) : (
-        <Pressable
-          onPress={() => sendFriendRequest(userId, item._id)}
-          style={styles.buttonAddFriend}
-        >
-          <Text style={styles.buttonText}>Add Friend</Text>
-        </Pressable>
-      )}
-    </Pressable>
+        <ListItem.Content right>
+          {userFriends.includes(item._id) ? (
+            <Pressable style={styles.buttonFriends}>
+              <Text style={styles.buttonText}>Friends</Text>
+            </Pressable>
+          ) : requestSent || friendRequests.some((friend) => friend._id === item._id) ? (
+            <Pressable style={styles.buttonRequestSent}>
+              <Text style={styles.buttonText}>Request Sent</Text>
+            </Pressable>
+          ) : (
+            <Pressable
+              onPress={() => sendFriendRequest(userId, item._id)}
+              style={styles.buttonAddFriend}
+            >
+              <Text style={styles.buttonText}>Add Friend</Text>
+            </Pressable>
+          )}
+        </ListItem.Content>
+    </ListItem>
   );
 };
 
@@ -87,7 +92,11 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 10,
+  },
+  userItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
   },
   image: {
     width: 50,

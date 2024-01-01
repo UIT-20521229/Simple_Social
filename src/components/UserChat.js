@@ -1,40 +1,40 @@
-import { StyleSheet, Text, View, Pressable, Image } from "react-native";
+import { StyleSheet, View, Pressable } from "react-native";
 import { useContext, useEffect, useState, memo } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { setUsers, setUserId } from '../redux/slices/userSlice';
 import { useDispatch, useSelector } from 'react-redux'
+import { IP } from "@env";
+import axios from 'axios';
+import { Image, Text } from '@rneui/themed'
 
 function UserChat({ item }) {
     const { userId } = useSelector(state => state.user);
     const [messages, setMessages] = useState([]);
     const navigation = useNavigation();
 
-    const fetchMessages = async () => {
-        // try {
-        //     const response = await fetch(
-        //         `http://${IP}:3200/messages/${userId}/${item._id}`
-        //     );
-        //     const data = await response.json();
-
-        //     if (response.ok) {
-        //         setMessages(data);
-        //     } else {
-        //         console.log("error showing messags", response.status.message);
-        //     }
-        // } catch (error) {
-        //     console.log("error fetching messages", error);
-        // }
-    };
-
     useEffect(() => {
+        const fetchMessages = async () => {
+            try {
+                await axios.get(`http://${IP}:3200/api/messages/${userId}/${item._id}`)
+                    .then(res => {
+                        setMessages(res.data)
+                    })
+                    .catch(err => console.log(err))
+            } catch (error) {
+                console.log("error fetching messages", error);
+            }
+        };
         fetchMessages();
     }, []);
-    console.log(messages);
 
     const getLastMessage = () => {
-        const userMessages = messages.filter(
-            (message) => message.messageType === "text"
-        );
+        const userMessages = messages.map((message) => {
+            const lastMessage = {
+                messages: message.text,
+                timeStamp: message.createdAt,
+            };
+            return lastMessage;
+        })
 
         const n = userMessages.length;
 
@@ -42,6 +42,7 @@ function UserChat({ item }) {
     };
     const lastMessage = getLastMessage();
     console.log(lastMessage);
+
     const formatTime = (time) => {
         const options = { hour: "numeric", minute: "numeric" };
         return new Date(time).toLocaleString("en-US", options);
@@ -57,14 +58,16 @@ function UserChat({ item }) {
         >
             <Image
                 style={styles.image}
-                source={{ uri: item?.image }}
+                source={{
+                    uri: item.image ? item.image : 'https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/81/81ae0c5055925b5470e7621b7a1a1918f75e2ff1.jpg'
+                }}
             />
 
             <View style={styles.content}>
                 <Text style={styles.name}>{item?.name}</Text>
                 {lastMessage && (
                     <Text style={styles.message}>
-                        {lastMessage?.message}
+                        {lastMessage?.messages}
                     </Text>
                 )}
             </View>

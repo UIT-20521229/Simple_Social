@@ -1,19 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
+const path = require('path');
 
 const users = require('../models/users');
 const messages = require('../models/messages');
-
-router.get('/getAllUsers', (req, res) => {
-    try {
-        const allUsers = users.find();
-        res.json(allUsers);
-    }
-    catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-})
+const posts = require('../models/posts');
+const comments = require('../models/comments');
 
 router.post('/register', (req, res) => {
     const { name, email, password, avatar } = req.body;
@@ -171,35 +164,32 @@ const storage = multer.diskStorage({
         cb(null, "files/"); // Specify the desired destination folder
     },
     filename: function (req, file, cb) {
-        // Generate a unique filename for the uploaded file
-        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-        cb(null, uniqueSuffix + "-" + file.originalname);
+        cb(null, file.fieldname + "_" + Date.now() + path.extname(file.originalname))
     },
 });
 
 const upload = multer({ storage: storage });
 
 //endpoint to post Messages and store it in the backend
-router.post("/messages", upload.single('imageFile'), async (req, res) => {
-    try {
-        const { _id, text, user, image, video, createdAt, receiveId } = req.body;
+router.post("/messages", upload.single('image'), async (req, res) => {
+    const { text, user, receiveId } = req.body;
+    const image = req.file.path;
+    const newMessage = new messages({
+        text,
+        user,
+        image: image,
+        createdAt: new Date(),
+        receiveId,
+    });
 
-        const newMessage = new messages({
-            text,
-            user,
-            image: image ? image.file.path : '',
-            video: video ? video : '',
-            createdAt: new Date(),
-            receiveId,
+    newMessage.save()
+        .then(() => {
+            res.status(200).json({ message: "Message added!!!" })
+        })
+        .catch(err => {
+            console.log("Error:", err);
+            res.status(500).json({ message: "Message fail!!!" })
         });
-
-        await newMessage.save();
-        res.status(200).json({ message: "Message sent Successfully" });
-
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
 });
 
 ///endpoint to get the userDetails to design the chat Room header
@@ -211,6 +201,7 @@ router.get("/user/:userId", async (req, res) => {
         const receiveId = await users.findById(userId);
 
         res.json(receiveId);
+
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: "Internal Server Error" });
@@ -231,7 +222,7 @@ router.get("/messages/:sendId/:receiveId", async (req, res) => {
             .select("-__v")
             .sort({ createdAt: 'desc' });
 
-        res.json(message);
+        res.send(message)
 
     } catch (error) {
         console.log(error);
@@ -256,5 +247,37 @@ router.post("/deleteMessages", async (req, res) => {
         res.status(500).json({ error: "Internal Server" });
     }
 });
+
+router.post('/posts', upload.single('image'), async (req, res) => {
+    const { userPost, content } = req.body;
+    console.log("req.file:", req.file);
+    const image = req.file.path;
+
+    const newPost = new posts({ userPost, content, image });
+    newPost.save()
+        .then(() => {
+            res.status(200).json({ message: "Post added!!!" })
+        })
+        .catch(err => {
+            console.log("Error:", err);
+            res.status(500).json({ message: "Post fail!!!" })
+        });
+})
+
+router.get('/getPosts', async (req, res) => {
+    try {
+        const allPosts = await posts.find()
+            .populate("userPost", "name avatar")
+            .select("-__v")
+            .sort({ createdAt: 'desc' })
+            .lean(true)
+
+        res.send(allPosts);
+    }
+    catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+})
+
 
 module.exports = router 
