@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { IP } from "@env";
 import {
   Alert, StyleSheet, Image, Text,
   Button, TextInput, View, SafeAreaView,
@@ -21,7 +22,7 @@ export default function Signup({ navigation }) {
       avatar: avatar,
     }
 
-    await axios.post("http://192.168.1.3:3200/api/register", user)
+    await axios.post(`http://${IP}:3200/api/register`, user)
       .then((response) => {
         console.log(response);
         Alert.alert(
