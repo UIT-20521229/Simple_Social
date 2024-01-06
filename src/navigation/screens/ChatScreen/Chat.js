@@ -40,8 +40,9 @@ export default function ChatsScreen() {
     <View style={styles.container}>
       <HeaderRNE
         leftComponent={{
-          icon: 'menu',
+          text: 'Message',
           color: '#fff',
+          style: { fontSize: 16, fontWeight: 'bold', color: 'white' },
           onPress: () => navigation.toggleDrawer(),
         }}
         rightComponent={
@@ -65,7 +66,6 @@ export default function ChatsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: StatusBar.currentHeight || 0,
   },
   header: {
     paddingHorizontal: 20,

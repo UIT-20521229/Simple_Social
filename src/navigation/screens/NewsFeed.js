@@ -1,20 +1,22 @@
-import { useEffect, useState, useLayoutEffect, useCallback } from 'react';
+import { useEffect, useState, useLayoutEffect, useCallback, useMemo } from 'react';
 import {
     StyleSheet, View, ScrollView,
     StatusBar, TextInput, Image,
-    TouchableOpacity, Text
+    TouchableOpacity, Text,
 } from 'react-native';
 import { Card } from '../../components/index';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { setUsers, setUserId } from '../../redux/slices/userSlice';
 import { useSelector, useDispatch } from 'react-redux'
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { jwtDecode } from 'jwt-decode';
 import { decode } from "base-64";
-import { useNavigation } from '@react-navigation/native';
 import { IP } from '@env'
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
+import BottomSheet from '@gorhom/bottom-sheet';
 global.atob = decode;
 
 export default function NewsFeed() {
@@ -25,6 +27,8 @@ export default function NewsFeed() {
     const [data, setData] = useState([]);
     const [text, setText] = useState('');
     const [image, setImage] = useState('');
+    const [activePost, setActivePost] = useState(false);
+    const snapPoints = useMemo(() => ['25%', '50%'], []);
 
     // Get user
     useEffect(() => {
@@ -58,7 +62,7 @@ export default function NewsFeed() {
                 })
         }
         fetchPosts()
-    }, [])
+    }, [activePost])
 
     // Prevent user from going back to Login screen
     useEffect(() => {
@@ -71,27 +75,23 @@ export default function NewsFeed() {
     })
 
     const handlePost = async () => {
-        try {
-            const formData = new FormData();
-            formData.append('image', {
-                uri: image.uri,
-                type: `${image.type}/jpeg`,
-                name: 'image.jpg'
-            } || '');
-            formData.append('content', text);
-            formData.append('userPost', userId);
+        const formData = new FormData();
+        formData.append('image', {
+            uri: image.uri,
+            type: `${image.type}/jpeg`,
+            name: 'image.jpg'
+        });
+        formData.append('content', text);
+        formData.append('userPost', userId);
 
-            const response = await axios.post(`http://${IP}:3200/api/posts`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            })
-            setData([response.data, ...data])
-            setText('')
-            setImage('')
-        } catch (error) {
-            console.log(error)
-        }
+        await axios.post(`http://${IP}:3200/api/posts`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        }).then(res => console.log(res)).catch(err => console.log(err.message))
+        setActivePost(!activePost)
+        setText('')
+        setImage('')
     }
 
     const pickImage = async () => {
@@ -108,43 +108,47 @@ export default function NewsFeed() {
     };
 
     return (
-        <View style={styles.container}>
-            <ScrollView style={styles.scrollView}>
-                <View style={styles.post}>
-                    <View style={styles.postViewInput}>
-                        <Image
-                            style={styles.avatar}
-                            source={{ uri: 'https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/81/81ae0c5055925b5470e7621b7a1a1918f75e2ff1.jpg' }} />
-                        <View style={styles.postInput}>
-                            <TextInput
-                                style={styles.inputField}
-                                placeholder='What are you thinking?'
-                                onChangeText={text => setText(text)}
-                                value={text}
-                            />
-                            {text.length > 0 ?
-                                <TouchableOpacity
-                                    style={styles.buttonSend}
-                                    onPress={handlePost}
-                                >
-                                    <Icon name='send' size={25} color={'cyan'} />
-                                </TouchableOpacity>
-                                : null
-                            }
+        <SafeAreaProvider>
+            <View style={styles.container}>
+                <ScrollView style={styles.scrollView}>
+                    <View style={styles.post}>
+                        <View style={styles.postViewInput}>
+                            <Image
+                                style={styles.avatar}
+                                source={{ uri: 'https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/81/81ae0c5055925b5470e7621b7a1a1918f75e2ff1.jpg' }} />
+                            <View style={styles.postInput}>
+                                <TextInput
+                                    style={styles.inputField}
+                                    placeholder='What are you thinking?'
+                                    onChangeText={text => setText(text)}
+                                    value={text}
+                                />
+                                {text.length > 0 ?
+                                    <TouchableOpacity
+                                        style={styles.buttonSend}
+                                        onPress={handlePost}
+                                    >
+                                        <Icon name='send' size={25} color={'cyan'} />
+                                    </TouchableOpacity>
+                                    : null
+                                }
+                            </View>
+                            <TouchableOpacity style={styles.button} onPress={pickImage}>
+                                <Icon name='photo' size={25} />
+                            </TouchableOpacity>
                         </View>
-                        <TouchableOpacity style={styles.button} onPress={pickImage}>
-                            <Icon name='photo' size={25} />
-                        </TouchableOpacity>
                     </View>
-                </View>
-                {data ? data.map(post => (
-                    <Card
-                        key={post._id}
-                        data={post}
-                    />
-                )) : null}
-            </ScrollView>
-        </View>
+                    {data ? data.map(post => (
+                        <View>
+                            <Card
+                                key={post._id}
+                                data={post}
+                            />
+                        </View>
+                    )) : null}
+                </ScrollView>
+            </View>
+        </SafeAreaProvider>
     );
 };
 
@@ -180,7 +184,7 @@ const styles = StyleSheet.create({
     postInput: {
         flex: 1,
         fontSize: 16,
-        backgroundColor: '#ccc',
+        backgroundColor: '#f4f2f0',
         height: 40,
         borderRadius: 50,
         paddingLeft: 15,

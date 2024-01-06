@@ -1,8 +1,8 @@
 import { NavigationContainer } from '@react-navigation/native';
 import AuthStack from './stacks/AuthStack';
-import BottomStack from './stacks/BottomStack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
+import DrawerStack from './stacks/DrawerStack';
 
 export default function RootNavigator() {
     const [isLogged, setIsLogged] = useState(false);
@@ -16,10 +16,10 @@ export default function RootNavigator() {
         };
         keepLoggedIn();
     }, []);
-    
+
     return (
         <NavigationContainer>
-            {isLogged ? <BottomStack /> : <AuthStack />}
+            {isLogged ? <DrawerStack /> : <AuthStack />}
         </NavigationContainer>
     )
 }

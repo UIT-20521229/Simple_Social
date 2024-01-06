@@ -1,17 +1,8 @@
 import React, { useState, useEffect, createContext, useLayoutEffect } from "react";
 import {
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  StatusBar,
-  TextInput,
-  Text,
-  Button,
-  FlatList,
-  Keyboard,
-  Image,
-  Alert,
-  KeyboardAvoidingView,
+  StyleSheet, View, TouchableOpacity, StatusBar,
+  Text, TextInput, Button, FlatList,
+  Keyboard, Image, Alert, KeyboardAvoidingView,
   ImageBackground,
 } from "react-native";
 import { CustomSwitch } from "../../components/index";
@@ -19,15 +10,14 @@ import { setTheme } from "../../redux/slices/themeSlice";
 import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { Icon } from '@rneui/themed'
 
 const bell = require("../../../assets/bell.png");
 const moon = require("../../../assets/moon.png");
 const feedback = require("../../../assets/comment.png");
 
-export default function SettingScreen() {
+export default function SettingScreen({ navigation }) {
   const dispatch = useDispatch();
-  const navigation = useNavigation();
   const { theme } = useSelector((state) => state.theme);
   const [switchTheme, setSwitchTheme] = useState(false);
   const [inputText, setInputText] = useState("");
@@ -35,11 +25,6 @@ export default function SettingScreen() {
   const [history, setHistory] = useState([]);
   console.log(theme);
   const textTheme = theme === "dark" ? styles.textDark : styles.textLight;
-
-  const handleLogOut = async () => {
-    await AsyncStorage.removeItem("token");
-    navigation.navigate("Login");
-  };
 
   const handleTextInput = (text) => {
     setInputText(text);
@@ -99,12 +84,12 @@ export default function SettingScreen() {
               <CustomSwitch isEnabled={noti} handleSwitch={handleSwitchNoti} />
             </View>
           </View>
+          {/* Feed back view */}
           <View style={styles.feedback}>
-            <View  style={styles.feedbackText}>
+            <View style={styles.feedbackText}>
               <Image source={feedback} style={{ width: 30, height: 30 }} />
               <Text style={[textTheme, styles.textInput]}>Feedback</Text>
             </View>
-           
             <TextInput
               underlineColorAndroid="transparent"
               placeholder="Type something"
@@ -117,7 +102,7 @@ export default function SettingScreen() {
             />
           </View>
           <TouchableOpacity style={styles.button}>
-            <Button title="Send Feedback" onPress={handleSendFeedback} style={styles.buttonsend}/>
+            <Button title="Send Feedback" onPress={handleSendFeedback} style={styles.buttonsend} />
           </TouchableOpacity>
           <View style={styles.list}>
             <FlatList
@@ -128,10 +113,11 @@ export default function SettingScreen() {
               keyExtractor={(item) => item.id}
             />
           </View>
-          <View style={[styles.buttonFooter ]} >
-            <TouchableOpacity onPress={handleLogOut}>
-              <Icon name="logout" size={30} />
-            </TouchableOpacity>
+          <View style={styles.buttonFooter}>
+            <Icon name='exit-outline' type='ionicon' size={40} onPress={() => {
+              AsyncStorage.clear()
+              navigation.replace("Login")
+            }} />
           </View>
         </View>
       </View>
@@ -142,7 +128,6 @@ export default function SettingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // paddingTop: 10
   },
   dark: {
     flex: 1,
@@ -169,16 +154,13 @@ const styles = StyleSheet.create({
     width: "60%",
   },
   logo: {
-    paddingTop: StatusBar.currentHeight,
     backgroundColor: "#58c2f0",
-    flex: 1,
+    flex: 2,
     width: "100%",
     justifyContent: "center",
     alignItems: "center",
-    maxHeight: 200,
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
-    marginBottom: 20,
   },
   logoImage: {
     width: 80,
@@ -208,7 +190,7 @@ const styles = StyleSheet.create({
   },
   feedback: {
     width: "100%",
-    paddingHorizontal: 20,
+    paddingHorizontal: 25,
   },
   feedbackText: {
     flexDirection: "row",
@@ -244,7 +226,6 @@ const styles = StyleSheet.create({
     width: "60%",
   },
   buttonFooter: {
-    flex: 1,
     width: "100%",
     justifyContent: "flex-end",
     alignItems: "flex-end",

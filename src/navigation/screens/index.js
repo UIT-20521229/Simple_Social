@@ -8,3 +8,4 @@ export { default as Setting } from './Setting';
 export { default as NewsFeed } from './NewsFeed';
 export { default as Splash } from './Splash';
 export { default as DetailsUser } from './DetailsUser';
+export { default as Help } from './Help';

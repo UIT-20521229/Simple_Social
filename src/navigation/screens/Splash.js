@@ -11,7 +11,7 @@ export default function Splash() {
         animation.current.play();
         setTimeout(() => {
             navigation.replace('Login')
-        }, 5000)
+        }, 3000)
     }, []);
 
     return (

@@ -9,7 +9,6 @@ import { sendMessage, reset } from '../../../redux/slices/messageSlice'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import * as ImagePicker from 'expo-image-picker';
 import 'react-native-get-random-values';
-import { v4 as uuid } from 'uuid';
 
 export default function ChatMessage() {
     const navigation = useNavigation()
@@ -17,6 +16,7 @@ export default function ChatMessage() {
     const route = useRoute()
 
     const { message } = useSelector(state => state.message)
+    const [sendMessages, setSendMessages] = useState(true)
     const { receiveId } = route.params
     const { userId } = useSelector(state => state.user)
     const [image, setImage] = useState('')
@@ -35,38 +35,29 @@ export default function ChatMessage() {
                 .catch(err => console.log(err))
         }
         fetchMessages()
-    }, [])
+    }, [image, sendMessages])
 
     const onSend = async (messages = []) => {
         const msg = messages[0]
-        const myMsg = {
-            _id: msg._id || uuid(),
-            text: msg.text,
-            user: msg.user,
-            image: image.uri || '',
-            createdAt: new Date().toISOString(),
-            receiveId: receiveId
-        }
-        console.log("myMsg", myMsg)
+        dispatch(sendMessage(msg))
         try {
             const data = new FormData()
-            data.append('text', myMsg.text)
-            data.append('user', myMsg.user._id)
+            data.append('text', msg.text)
+            data.append('user', msg.user._id)
             data.append('image', {
                 uri: image.uri,
                 type: `${image.type}/jpeg`,
                 name: 'image.jpg'
             } || null);
-            data.append('receiveId', myMsg.receiveId)
-            console.log("data", data._parts)
+            data.append('receiveId', receiveId)
+
             const respone = await axios.post(`http://${IP}:3200/api/messages`, data, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             })
-            dispatch(sendMessage(myMsg))
+            setSendMessages(!sendMessages)
             setImage('')
-            console.log(respone.data)
         } catch (error) {
             console.log(error.status.message)
         }

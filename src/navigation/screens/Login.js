@@ -7,10 +7,12 @@ import {
 import { IP } from "@env";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 
-export default function Login({ navigation }) {
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigation = useNavigation();
 
   const onHandleLogin = useCallback(async () => {
     const user = {
@@ -30,7 +32,7 @@ export default function Login({ navigation }) {
           "Login Error",
           "An error occurred while logging in"
         );
-        console.log("login failed", error);
+        console.log("login failed", error.message);
       });
   })
 

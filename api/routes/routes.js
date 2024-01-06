@@ -173,7 +173,10 @@ const upload = multer({ storage: storage });
 //endpoint to post Messages and store it in the backend
 router.post("/messages", upload.single('image'), async (req, res) => {
     const { text, user, receiveId } = req.body;
-    const image = req.file.path;
+    let image = '';
+    if (req.file !== undefined) {
+        image = req.file.path;
+    }
     const newMessage = new messages({
         text,
         user,
@@ -250,8 +253,10 @@ router.post("/deleteMessages", async (req, res) => {
 
 router.post('/posts', upload.single('image'), async (req, res) => {
     const { userPost, content } = req.body;
-    console.log("req.file:", req.file);
-    const image = req.file.path;
+    let image = '';
+    if (req.file !== undefined) {
+        image = req.file.path;
+    }
 
     const newPost = new posts({ userPost, content, image });
     newPost.save()
@@ -259,7 +264,6 @@ router.post('/posts', upload.single('image'), async (req, res) => {
             res.status(200).json({ message: "Post added!!!" })
         })
         .catch(err => {
-            console.log("Error:", err);
             res.status(500).json({ message: "Post fail!!!" })
         });
 })
@@ -279,5 +283,26 @@ router.get('/getPosts', async (req, res) => {
     }
 })
 
+// router.post('/like', async (req, res) => {
+//     const { _id, activeLike } = req.body;
+//     const filter = { _id: _id };
+//     const updateIncrease = { $inc: { like: 1 } };
+//     const updateDecrease = { $inc: { like: -1 } };
+//     try {
+//         if (activeLike) {
+//             const post = await posts.findOneAndUpdate(filter, updateIncrease)
+//             await post.save();
+//             res.status(200).json({ message: "Like successfully" });
+//         }
+//         else {
+//             const post = await posts.findOneAndUpdate(filter, updateDecrease)
+//             await post.save();
+//             res.status(200).json({ message: "UnLike successfully" });
+//         }
+//     } catch (error) {
+//         console.log(error);
+//         res.status(500).json({ error: "Internal Server Error" });
+//     }
+// })
 
 module.exports = router 

@@ -71,7 +71,7 @@ export default function DetailsUser() {
                 />
             </View>
             <View>
-                
+
             </View>
         </View>
     )
