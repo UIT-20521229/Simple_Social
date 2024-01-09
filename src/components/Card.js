@@ -10,7 +10,7 @@ import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-function Card({ data }) {
+function Card({ data, onPress }) {
     // Get user from redux
     const { userId } = useSelector(state => state.user);
     // Bottom Sheet
@@ -144,7 +144,7 @@ function Card({ data }) {
                                 }
                                 <Text style={styles.buttonText}>Likes</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.buttonPost} onPress={handleOpen}>
+                            <TouchableOpacity style={styles.buttonPost} onPress={onPress}>
                                 <Icon name="comment-o" size={15} color="#000" />
                                 <Text style={styles.buttonText}>Comments</Text>
                             </TouchableOpacity>

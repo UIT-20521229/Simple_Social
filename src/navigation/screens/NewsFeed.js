@@ -16,7 +16,10 @@ import { decode } from "base-64";
 import { IP } from '@env'
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
-import BottomSheet from '@gorhom/bottom-sheet';
+import {
+    BottomSheetModal,
+    BottomSheetModalProvider,
+} from '@gorhom/bottom-sheet';
 global.atob = decode;
 
 export default function NewsFeed() {
@@ -29,6 +32,11 @@ export default function NewsFeed() {
     const [image, setImage] = useState('');
     const [activePost, setActivePost] = useState(false);
     const snapPoints = useMemo(() => ['25%', '50%'], []);
+    const bottomSheetModalRef = useRef(null);
+    const openModal = (item) => {
+        setHouseDataModal(item);
+        bottomSheetModalRef.current.present();
+    };
 
     // Get user
     useEffect(() => {
@@ -108,47 +116,56 @@ export default function NewsFeed() {
     };
 
     return (
-        <SafeAreaProvider>
-            <View style={styles.container}>
-                <ScrollView style={styles.scrollView}>
-                    <View style={styles.post}>
-                        <View style={styles.postViewInput}>
-                            <Image
-                                style={styles.avatar}
-                                source={{ uri: 'https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/81/81ae0c5055925b5470e7621b7a1a1918f75e2ff1.jpg' }} />
-                            <View style={styles.postInput}>
-                                <TextInput
-                                    style={styles.inputField}
-                                    placeholder='What are you thinking?'
-                                    onChangeText={text => setText(text)}
-                                    value={text}
-                                />
-                                {text.length > 0 ?
-                                    <TouchableOpacity
-                                        style={styles.buttonSend}
-                                        onPress={handlePost}
-                                    >
-                                        <Icon name='send' size={25} color={'cyan'} />
-                                    </TouchableOpacity>
-                                    : null
-                                }
-                            </View>
-                            <TouchableOpacity style={styles.button} onPress={pickImage}>
-                                <Icon name='photo' size={25} />
-                            </TouchableOpacity>
+        <View style={styles.container}>
+            <ScrollView style={styles.scrollView}>
+                <View style={styles.post}>
+                    <View style={styles.postViewInput}>
+                        <Image
+                            style={styles.avatar}
+                            source={{ uri: 'https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/81/81ae0c5055925b5470e7621b7a1a1918f75e2ff1.jpg' }} />
+                        <View style={styles.postInput}>
+                            <TextInput
+                                style={styles.inputField}
+                                placeholder='What are you thinking?'
+                                onChangeText={text => setText(text)}
+                                value={text}
+                            />
+                            {text.length > 0 ?
+                                <TouchableOpacity
+                                    style={styles.buttonSend}
+                                    onPress={handlePost}
+                                >
+                                    <Icon name='send' size={25} color={'cyan'} />
+                                </TouchableOpacity>
+                                : null
+                            }
                         </View>
+                        <TouchableOpacity style={styles.button} onPress={pickImage}>
+                            <Icon name='photo' size={25} />
+                        </TouchableOpacity>
                     </View>
-                    {data ? data.map(post => (
-                        <View>
+                </View>
+                {data ? data.map(post => (
+                    <BottomSheetModalProvider>
+                        <SafeAreaView>
                             <Card
                                 key={post._id}
                                 data={post}
+                                onPress={() => openModal(post)}
                             />
-                        </View>
-                    )) : null}
-                </ScrollView>
-            </View>
-        </SafeAreaProvider>
+                        </SafeAreaView>
+                        <BottomSheetModal
+                            ref={bottomSheetModalRef}
+                            index={0}
+                            snapPoints={snapPoints}
+                            style={styles.bottomSheet}
+                        >
+                            <BottomSheetModalComponent {...houseDataModal} />
+                        </BottomSheetModal>
+                    </BottomSheetModalProvider>
+                )) : null}
+            </ScrollView>
+        </View>
     );
 };
 
