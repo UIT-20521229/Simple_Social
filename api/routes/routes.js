@@ -6,7 +6,6 @@ const path = require('path');
 const users = require('../models/users');
 const messages = require('../models/messages');
 const posts = require('../models/posts');
-const comments = require('../models/comments');
 
 router.post('/register', (req, res) => {
     const { name, email, password, avatar } = req.body;
@@ -283,26 +282,29 @@ router.get('/getPosts', async (req, res) => {
     }
 })
 
-// router.post('/like', async (req, res) => {
-//     const { _id, activeLike } = req.body;
-//     const filter = { _id: _id };
-//     const updateIncrease = { $inc: { like: 1 } };
-//     const updateDecrease = { $inc: { like: -1 } };
-//     try {
-//         if (activeLike) {
-//             const post = await posts.findOneAndUpdate(filter, updateIncrease)
-//             await post.save();
-//             res.status(200).json({ message: "Like successfully" });
-//         }
-//         else {
-//             const post = await posts.findOneAndUpdate(filter, updateDecrease)
-//             await post.save();
-//             res.status(200).json({ message: "UnLike successfully" });
-//         }
-//     } catch (error) {
-//         console.log(error);
-//         res.status(500).json({ error: "Internal Server Error" });
-//     }
-// })
+router.put("/like", async (req, res) => {
+    try {
+        const { postId, userId } = req.body;
+        const post = await posts.findById(postId);
+        if (!post) {
+            return res.status(404).json({ message: "Post not found" });
+        }
+        if (post.likes.includes(userId)) {
+            const like = await posts.findById(postId, {
+                $pull: { likes: userId },
+            });
+            like.save()
+        }
+        else {
+            const like = await posts.findById(postId, {
+                $push: { likes: userId },
+            });
+            like.save()
+        }
+    }
+    catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+})
 
 module.exports = router 

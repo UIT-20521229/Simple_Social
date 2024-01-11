@@ -5,7 +5,7 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { IP } from '@env'
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { Button, ListItem, BottomSheet } from '@rneui/themed';
+import { Button, ListItem } from '@rneui/themed';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -16,14 +16,6 @@ function Card({ data, onPress }) {
     // Bottom Sheet
     const bottomSheetRef = useRef(null);
     const handleOpen = () => setIsVisible(true);
-    const list = [
-        {
-            title: 'Cancel',
-            containerStyle: { backgroundColor: 'red' },
-            titleStyle: { color: 'white' },
-            onPress: () => setIsVisible(false),
-        },
-    ];
 
     // Navigation and Route
     const navigation = useNavigation();
@@ -55,7 +47,6 @@ function Card({ data, onPress }) {
         }
     }, [image]);
 
-
     // Handle post
     const handleActiveLike = (e) => {
         setActiveLike(!activeLike);
@@ -63,26 +54,21 @@ function Card({ data, onPress }) {
     }
     console.log(data)
     const handleLike = (e) => {
-        if (activeLike) {
-            setCountLike(countlike + 1);
-        } else {
-            setCountLike(countlike - 1);
+        const dataForm = {
+            postId: data._id,
+            userLike: userId,
         }
-        // const dataForm = {
-        //     activeLike: activeLike,
-        //     _id: data._id,
-        // }
-        // axios.post(`http://${IP}:3200/api/like`, dataForm, {
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        // })
-        //     .then(res => {
-        //         console.log(res.data);
-        //     })
-        //     .catch(err => {
-        //         console.log(err);
-        //     })
+        axios.put(`http://${IP}:3200/api/like`, dataForm, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(res => {
+                console.log(res.data);
+            })
+            .catch(err => {
+                console.log(err);
+            })
     }
 
     const handleShare = (e) => {
@@ -156,19 +142,6 @@ function Card({ data, onPress }) {
                     </View>
                 </View>
             </View>
-            <BottomSheet modalProps={{}} isVisible={isVisible}>
-                {list.map((l, i) => (
-                    <ListItem
-                        key={i}
-                        containerStyle={l.containerStyle}
-                        onPress={l.onPress}
-                    >
-                        <ListItem.Content>
-                            <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
-                        </ListItem.Content>
-                    </ListItem>
-                ))}
-            </BottomSheet>
         </SafeAreaProvider>
     );
 };
@@ -189,7 +162,6 @@ const styles = StyleSheet.create({
         flex: 0.1,
         backgroundColor: 'white',
         padding: 10,
-        marginTop: 10,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
         borderBottomLeftRadius: 20,

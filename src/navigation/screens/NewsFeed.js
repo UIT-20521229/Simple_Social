@@ -1,8 +1,8 @@
-import { useEffect, useState, useLayoutEffect, useCallback, useMemo } from 'react';
+import { useEffect, useState, useLayoutEffect, useCallback, useMemo, useRef } from 'react';
 import {
     StyleSheet, View, ScrollView,
     StatusBar, TextInput, Image,
-    TouchableOpacity, Text,
+    TouchableOpacity, Text, SafeAreaView
 } from 'react-native';
 import { Card } from '../../components/index';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -16,10 +16,8 @@ import { decode } from "base-64";
 import { IP } from '@env'
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
-import {
-    BottomSheetModal,
-    BottomSheetModalProvider,
-} from '@gorhom/bottom-sheet';
+import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { BottomSheetModalComponent } from '../../components/index';
 global.atob = decode;
 
 export default function NewsFeed() {
@@ -31,11 +29,12 @@ export default function NewsFeed() {
     const [text, setText] = useState('');
     const [image, setImage] = useState('');
     const [activePost, setActivePost] = useState(false);
-    const snapPoints = useMemo(() => ['25%', '50%'], []);
+
+    const snapPoints = useMemo(() => ["97%"], []);
     const bottomSheetModalRef = useRef(null);
     const openModal = (item) => {
-        setHouseDataModal(item);
-        bottomSheetModalRef.current.present();
+        console.log('click')
+        bottomSheetModalRef.current?.present();
     };
 
     // Get user
@@ -70,6 +69,9 @@ export default function NewsFeed() {
                 })
         }
         fetchPosts()
+        return () => {
+            setData([])
+        }
     }, [activePost])
 
     // Prevent user from going back to Login screen
@@ -116,56 +118,54 @@ export default function NewsFeed() {
     };
 
     return (
-        <View style={styles.container}>
-            <ScrollView style={styles.scrollView}>
-                <View style={styles.post}>
-                    <View style={styles.postViewInput}>
-                        <Image
-                            style={styles.avatar}
-                            source={{ uri: 'https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/81/81ae0c5055925b5470e7621b7a1a1918f75e2ff1.jpg' }} />
-                        <View style={styles.postInput}>
-                            <TextInput
-                                style={styles.inputField}
-                                placeholder='What are you thinking?'
-                                onChangeText={text => setText(text)}
-                                value={text}
-                            />
-                            {text.length > 0 ?
-                                <TouchableOpacity
-                                    style={styles.buttonSend}
-                                    onPress={handlePost}
-                                >
-                                    <Icon name='send' size={25} color={'cyan'} />
-                                </TouchableOpacity>
-                                : null
-                            }
+        <BottomSheetModalProvider>
+            <View style={styles.container}>
+                <ScrollView style={styles.scrollView}>
+                    <View style={styles.post}>
+                        <View style={styles.postViewInput}>
+                            <Image
+                                style={styles.avatar}
+                                source={{ uri: 'https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/81/81ae0c5055925b5470e7621b7a1a1918f75e2ff1.jpg' }} />
+                            <View style={styles.postInput}>
+                                <TextInput
+                                    style={styles.inputField}
+                                    placeholder='What are you thinking?'
+                                    onChangeText={text => setText(text)}
+                                    value={text}
+                                />
+                                {text.length > 0 ?
+                                    <TouchableOpacity
+                                        style={styles.buttonSend}
+                                        onPress={handlePost}
+                                    >
+                                        <Icon name='send' size={25} color={'cyan'} />
+                                    </TouchableOpacity>
+                                    : null
+                                }
+                            </View>
+                            <TouchableOpacity style={styles.button} onPress={pickImage}>
+                                <Icon name='photo' size={25} />
+                            </TouchableOpacity>
                         </View>
-                        <TouchableOpacity style={styles.button} onPress={pickImage}>
-                            <Icon name='photo' size={25} />
-                        </TouchableOpacity>
                     </View>
-                </View>
-                {data ? data.map(post => (
-                    <BottomSheetModalProvider>
-                        <SafeAreaView>
+                    {data ? data.map(post => (
+                        <SafeAreaView style={styles.container} key={post._id}>
                             <Card
-                                key={post._id}
                                 data={post}
                                 onPress={() => openModal(post)}
                             />
+                            <BottomSheetModal
+                                ref={bottomSheetModalRef}
+                                index={0}
+                                snapPoints={snapPoints}
+                            >
+                                <BottomSheetModalComponent />
+                            </BottomSheetModal>
                         </SafeAreaView>
-                        <BottomSheetModal
-                            ref={bottomSheetModalRef}
-                            index={0}
-                            snapPoints={snapPoints}
-                            style={styles.bottomSheet}
-                        >
-                            <BottomSheetModalComponent {...houseDataModal} />
-                        </BottomSheetModal>
-                    </BottomSheetModalProvider>
-                )) : null}
-            </ScrollView>
-        </View>
+                    )) : null}
+                </ScrollView>
+            </View>
+        </BottomSheetModalProvider>
     );
 };
 
@@ -232,7 +232,14 @@ const styles = StyleSheet.create({
         height: 40,
         borderRadius: 50 / 2,
     },
-
+    bottomSheet: {
+        backgroundColor: "lavender",
+        flex: 1,
+    },
+    contentContainer: {
+        flex: 1,
+        alignItems: 'center',
+    },
 });
 
 
