@@ -2,7 +2,8 @@ import { useEffect, useState, useLayoutEffect, useCallback, useMemo, useRef } fr
 import {
     StyleSheet, View, ScrollView,
     StatusBar, TextInput, Image,
-    TouchableOpacity, Text, SafeAreaView
+    TouchableOpacity, Text, SafeAreaView,
+    ActivityIndicator
 } from 'react-native';
 import { Card } from '../../components/index';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -26,6 +27,7 @@ export default function NewsFeed() {
     const navigation = useNavigation();
     const { userId, userLoading } = useSelector(state => state.user);
     const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [text, setText] = useState('');
     const [image, setImage] = useState('');
     const [activePost, setActivePost] = useState(false);
@@ -57,12 +59,13 @@ export default function NewsFeed() {
     }, [userId]);
 
     // Get all posts
-    useLayoutEffect(() => {
+    useEffect(() => {
         const fetchPosts = async () => {
             await axios.get(`http://${IP}:3200/api/getPosts`)
                 .then(res => {
                     console.log("res:", res)
                     setData(res.data)
+                    setLoading(false)
                 })
                 .catch(err => {
                     console.log("err:", err)
@@ -148,7 +151,7 @@ export default function NewsFeed() {
                             </TouchableOpacity>
                         </View>
                     </View>
-                    {data ? data.map(post => (
+                    {loading ? data.map(post => (
                         <SafeAreaView style={styles.container} key={post._id}>
                             <Card
                                 data={post}
@@ -162,7 +165,7 @@ export default function NewsFeed() {
                                 <BottomSheetModalComponent />
                             </BottomSheetModal>
                         </SafeAreaView>
-                    )) : null}
+                    )) : <ActivityIndicator size="large" color="#0000ff" />}
                 </ScrollView>
             </View>
         </BottomSheetModalProvider>

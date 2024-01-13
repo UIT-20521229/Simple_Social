@@ -145,7 +145,7 @@ router.get("/accepted-friends/:userId", async (req, res) => {
         const user = await users.findById(userId).populate(
             "friends",
             "name email image"
-        );
+        ).lean()
         const acceptedFriends = user.friends;
         res.json(acceptedFriends);
     } catch (error) {
@@ -222,7 +222,8 @@ router.get("/messages/:sendId/:receiveId", async (req, res) => {
             ],
         }).populate("user", "name email image")
             .select("-__v")
-            .sort({ createdAt: 'desc' });
+            .sort({ createdAt: 'desc' })
+            .lean();
 
         res.send(message)
 
@@ -273,7 +274,8 @@ router.get('/getPosts', async (req, res) => {
             .populate("userPost", "name avatar")
             .select("-__v")
             .sort({ createdAt: 'desc' })
-            .lean(true)
+            .limit(10)
+            .lean()
 
         res.send(allPosts);
     }
@@ -284,23 +286,35 @@ router.get('/getPosts', async (req, res) => {
 
 router.put("/like", async (req, res) => {
     try {
-        const { postId, userId } = req.body;
+        const { postId, userLike } = req.body;
         const post = await posts.findById(postId);
         if (!post) {
             return res.status(404).json({ message: "Post not found" });
         }
-        if (post.likes.includes(userId)) {
-            const like = await posts.findById(postId, {
-                $pull: { likes: userId },
-            });
-            like.save()
+        if (post.likes.includes(userLike)) {
+            post.likes.pull(userLike);
+            await post.save();
+            return res.status(400).json({ message: "Post unliked" });
         }
-        else {
-            const like = await posts.findById(postId, {
-                $push: { likes: userId },
-            });
-            like.save()
+        post.likes.push(userLike)
+        await post.save();
+        res.status(200).json({ message: "Post liked successfully" });
+    }
+    catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+})
+
+router.post("/comment", async (req, res) => {
+    try {
+        const { postId, userComment, content } = req.body;
+        const post = await posts.findById(postId);
+        if (!post) {
+            return res.status(404).json({ message: "Post not found" });
         }
+        post.comments.push({ userComment, content });
+        await post.save();
+        res.status(200).json({ message: "Comment added successfully" });
     }
     catch (err) {
         res.status(500).json({ message: err.message });

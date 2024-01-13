@@ -22,7 +22,7 @@ function Card({ data, onPress }) {
     const route = useRoute();
 
     // Define state actions
-    const [countlike, setCountLike] = useState(0);
+    const [countlike, setCountLike] = useState(data.likes.length);
     const [activeLike, setActiveLike] = useState(true);
     const [comment, setComment] = useState([data.comment]);
     const [share, setShare] = useState(data.share);
@@ -30,7 +30,6 @@ function Card({ data, onPress }) {
     const [input, setInput] = useState('');
     const [comments, setComments] = useState([]);
     const [isVisible, setIsVisible] = useState(false);
-    const [like, setLike] = useState(data.like);
 
     // handle date time
     const moment = require('moment');
@@ -40,19 +39,10 @@ function Card({ data, onPress }) {
 
     // Handle image path
     useEffect(() => {
-        if (data.image !== '' && data.image !== null) {
-            const pathName = data.image;
-            const fileName = pathName.split('\\').pop().split('/').pop();
-            setImage(fileName);
-        }
-    }, [image]);
+        
+    }, []);
 
     // Handle post
-    const handleActiveLike = (e) => {
-        setActiveLike(!activeLike);
-        handleLike();
-    }
-    console.log(data)
     const handleLike = (e) => {
         const dataForm = {
             postId: data._id,
@@ -69,7 +59,9 @@ function Card({ data, onPress }) {
             .catch(err => {
                 console.log(err);
             })
+        setActiveLike(!activeLike);
     }
+    
 
     const handleShare = (e) => {
         setShare(share + 1);
@@ -122,8 +114,8 @@ function Card({ data, onPress }) {
                         </View>
                         <View style={styles.straightLine}></View>
                         <View style={styles.button}>
-                            <TouchableOpacity style={styles.buttonPost} onPress={handleActiveLike}>
-                                {activeLike ?
+                            <TouchableOpacity style={styles.buttonPost} onPress={handleLike}>
+                                {activeLike && data.likes.includes(userId) === false ?
                                     <Icon name="thumbs-o-up" size={15} color="#000" />
                                     :
                                     <Icon name="thumbs-up" size={15} color="#000" />

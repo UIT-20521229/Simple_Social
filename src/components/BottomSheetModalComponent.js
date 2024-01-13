@@ -3,19 +3,14 @@ import {
     FlatList, TextInput,
     ScrollView, KeyboardAvoidingView
 } from "react-native";
-import { } from "react";
-import { FontAwesome } from "@expo/vector-icons";
-import { Fontisto } from "@expo/vector-icons";
-import { MaterialIcons } from "@expo/vector-icons";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useState, useEffect } from "react";
+import { IP } from "@env";
 import { Icon, Input } from '@rneui/themed'
+import axios from "axios";
 
-const BottomSheetModalComponent = ({
-    avatar,
-    name,
-    content,
-    like,
-}) => {
+const BottomSheetModalComponent = ({ avatar, name, content, like }) => {
+    const [comment, setComment] = useState("");
+    
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
