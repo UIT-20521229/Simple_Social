@@ -10,7 +10,8 @@ const dbURL = 'mongodb+srv://duy777:duy777@cluster0.5gxf74l.mongodb.net/';
 
 require('dotenv').config();
 
-const routes = require('./routes/routes');
+// const routes = require('./routes');
+const route = require('./routes/index.routes');
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -18,12 +19,12 @@ app.use(bodyParser.json());
 app.use(express.static('files'));
 app.use(passport.initialize());
 
-app.use('/api', routes)
+route(app)
 
-const mongoString = dbURL;
-mongoose.connect(mongoString)
-    .then(() => console.log('MongoDB Connected'))
-    .catch(err => console.log(err))
+// const mongoString = dbURL;
+// mongoose.connect(mongoString)
+//     .then(() => console.log('MongoDB Connected'))
+//     .catch(err => console.log(err))
 
 app.listen(3200, () => {
     console.log(`Server Started at ${port}`)
