@@ -27,7 +27,7 @@ export default function NewsFeed() {
     const navigation = useNavigation();
     const { userId, userLoading } = useSelector(state => state.user);
     const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [text, setText] = useState('');
     const [image, setImage] = useState('');
     const [activePost, setActivePost] = useState(false);
@@ -65,7 +65,7 @@ export default function NewsFeed() {
                 .then(res => {
                     console.log("res:", res)
                     setData(res.data)
-                    setLoading(false)
+                    setLoading(true)
                 })
                 .catch(err => {
                     console.log("err:", err)
