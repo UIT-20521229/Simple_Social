@@ -8,9 +8,23 @@ import { IP } from "@env";
 import { Icon, Input } from '@rneui/themed'
 import axios from "axios";
 
-const BottomSheetModalComponent = ({ avatar, name, content, like }) => {
+const BottomSheetModalComponent = () => {
     const [comment, setComment] = useState("");
-    
+    const [comments, setComments] = useState([]);
+
+    useEffect(() => {
+        const fetchComments = async () => {
+            await axios.get(`http://${IP}:3200/api/comments`)
+                .then(res => {
+                    setComments(res.data)
+                })
+                .catch(err => {
+                    console.log("err:", err)
+                })
+        }
+        fetchComments()
+    }, [comments]);
+
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -18,18 +32,24 @@ const BottomSheetModalComponent = ({ avatar, name, content, like }) => {
             keyboardVerticalOffset={100}
         >
             <View style={styles.container}>
-                <ScrollView style={styles.commentPost}>
-                    <View style={styles.userComment}>
-                        <Image
-                            style={styles.avatar}
-                            source={{ uri: avatar }}
-                        />
-                        <View style={styles.comment}>
-                            <Text style={styles.name}>{name}</Text>
-                            <Text style={styles.content}>{content}</Text>
-                        </View>
-                    </View>
-                </ScrollView>
+
+                <FlatList
+                    data={comments}
+                    renderItem={({ item }) =>
+                        <ScrollView style={styles.commentPost}>
+                            <View style={styles.userComment}>
+                                <Image
+                                    style={styles.avatar}
+                                    source={{ uri: item.avatar }}
+                                />
+                                <View style={styles.comment}>
+                                    <Text style={styles.name}>{item.name}</Text>
+                                    <Text style={styles.content}>{item.content}</Text>
+                                </View>
+                            </View>
+                        </ScrollView>}
+                    keyExtractor={item => item.id}
+                />
                 <View style={styles.commentInput}>
                     <Input
                         placeholder="Comment here..."
