@@ -26,7 +26,6 @@ export default function ChatMessage() {
     }, [navigation])
 
     useEffect(() => {
-        dispatch(reset())
         const fetchMessages = () => {
             axios.get(`http://${IP}:3200/api/messages/${userId}/${receiveId}`)
                 .then(res => {
@@ -35,11 +34,13 @@ export default function ChatMessage() {
                 .catch(err => console.log(err))
         }
         fetchMessages()
-    }, [image, sendMessages])
+        return () => {
+            dispatch(reset())
+        }
+    }, [sendMessages])
 
     const onSend = async (messages = []) => {
         const msg = messages[0]
-        dispatch(sendMessage(msg))
         try {
             const data = new FormData()
             data.append('text', msg.text)
@@ -50,7 +51,6 @@ export default function ChatMessage() {
                 name: 'image.jpg'
             } || null);
             data.append('receiveId', receiveId)
-
             const respone = await axios.post(`http://${IP}:3200/api/messages`, data, {
                 headers: {
                     'Content-Type': 'multipart/form-data'

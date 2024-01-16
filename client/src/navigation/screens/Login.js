@@ -20,7 +20,7 @@ export default function Login() {
       password: password,
     };
 
-    await axios.post(`http://${IP}:3200/api/login`, user)
+    await axios.post(`http://${IP}:3200/users/login`, user)
       .then(async (response) => {
         console.log(response);
         const token = response.data.token;

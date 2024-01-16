@@ -8,13 +8,13 @@ const postsController = require('../controllers/PostsController');
 // ------------------ Posts ------------------ //
 
 // endpoint create posts
-router.post('/posts', upload.single('image'), postsController.create_posts);
+router.post('/create-posts', upload.single('image'), postsController.create_posts);
 // endpoint get posts
-router.get('/posts', postsController.get_posts);
+router.get('/get-posts', postsController.get_posts);
 // endpoint like posts
-router.put("/like", postsController.like_post);
+router.put("/active-like", postsController.like_post);
 // endpoint comment posts
-router.post("/comment", postsController.comment_post);
+router.post("/create-comment", postsController.comment_post);
 
 
 

@@ -14,7 +14,7 @@ const BottomSheetModalComponent = () => {
 
     useEffect(() => {
         const fetchComments = async () => {
-            await axios.get(`http://${IP}:3200/api/comments`)
+            await axios.get(`http://${IP}:3200/posts/comment`)
                 .then(res => {
                     setComments(res.data)
                 })

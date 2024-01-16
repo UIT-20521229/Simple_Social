@@ -14,7 +14,6 @@ export const themeSlice = createSlice({
         setTheme: (state, action) => {
             state.theme = action.payload
         },
-        reset: state => initialState,
     },
 })
 

@@ -21,10 +21,10 @@ app.use(passport.initialize());
 
 route(app)
 
-// const mongoString = dbURL;
-// mongoose.connect(mongoString)
-//     .then(() => console.log('MongoDB Connected'))
-//     .catch(err => console.log(err))
+const mongoString = dbURL;
+mongoose.connect(mongoString)
+    .then(() => console.log('MongoDB Connected'))
+    .catch(err => console.log(err))
 
 app.listen(3200, () => {
     console.log(`Server Started at ${port}`)

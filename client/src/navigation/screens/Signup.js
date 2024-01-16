@@ -22,7 +22,7 @@ export default function Signup({ navigation }) {
       avatar: avatar,
     }
 
-    await axios.post(`http://${IP}:3200/api/register`, user)
+    await axios.post(`http://${IP}:3200/users/register`, user)
       .then((response) => {
         console.log(response);
         Alert.alert(
