@@ -13,7 +13,7 @@ const FriendRequest = ({ item, friendRequests, setFriendRequests }) => {
     const acceptRequest = async (friendRequestId) => {
         try {
             const response = await fetch(
-                `http://${IP}:3200/api/friend-request/accept`,
+                `http://${IP}:3200/users/friend-request/accept`,
                 {
                     method: "POST",
                     headers: {

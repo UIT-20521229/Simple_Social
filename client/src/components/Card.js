@@ -48,7 +48,7 @@ function Card({ data, onPress }) {
             postId: data._id,
             userLike: userId,
         }
-        axios.put(`http://${IP}:3200/api/like`, dataForm, {
+        axios.put(`http://${IP}:3200/posts/active-like`, dataForm, {
             headers: {
                 'Content-Type': 'application/json',
             },

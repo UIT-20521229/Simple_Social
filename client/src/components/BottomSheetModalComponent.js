@@ -20,6 +20,7 @@ const BottomSheetModalComponent = ({ postId }) => {
         const fetchComments = async () => {
             await axios.get(`http://${IP}:3200/posts/get-comments/${postId}`)
                 .then(res => {
+                    console.log(res.data)
                     setComments(res.data)
                 })
                 .catch(err => {
@@ -29,26 +30,26 @@ const BottomSheetModalComponent = ({ postId }) => {
         fetchComments()
     }, []);
 
-    const sendComment = useCallback(async () => {
-        const data = new FormData
-        data.append("postId", postId)
-        data.append("userComment", userId)
-        data.append("content", comment)
+    const sendComment = async () => {
+        const formData = new FormData();
+        formData.append('postId', postId)
+        formData.append('userComment', userId)
+        formData.append('content', comment)
 
-        await axios.post(`http://${IP}:3200/posts/create-comment`, data, {
+        await axios.post(`http://${IP}:3200/posts/create-comment`, formData, {
             headers: {
-                "Content-Type": "multipart/form-data"
+                'Content-Type': 'multipart/form-data',
             }
         })
             .then(res => {
-                console.log(res.data)
+                console.log(res)
             })
             .catch(err => {
                 console.log("err:", err)
             })
         setSend(!send)
         setComment("")
-    }, [])
+    }
 
     return (
         <KeyboardAvoidingView
@@ -57,7 +58,6 @@ const BottomSheetModalComponent = ({ postId }) => {
             keyboardVerticalOffset={100}
         >
             <View style={styles.container}>
-
                 <FlatList
                     data={comments}
                     renderItem={({ item }) =>
@@ -65,11 +65,11 @@ const BottomSheetModalComponent = ({ postId }) => {
                             <View style={styles.userComment}>
                                 <Image
                                     style={styles.avatar}
-                                    source={{ uri: item.avatar }}
+                                    source={{ uri: item.avatar || "https://i.stack.imgur.com/l60Hf.png"}}
                                 />
                                 <View style={styles.comment}>
-                                    <Text style={styles.name}>{item.name}</Text>
-                                    <Text style={styles.content}>{item.content}</Text>
+                                    <Text style={styles.name}>{item.userComment.name}</Text>
+                                    <Text style={styles.content}>asiodjioqwenmonzxoczxcmiojioqwjejzxiocjioasjodijioasjdiojiojqwioejioasjasdasdasdadadaadoi</Text>
                                 </View>
                             </View>
                         </ScrollView>}
@@ -98,6 +98,7 @@ const styles = StyleSheet.create({
     },
     commentPost: {
         flex: 1,
+        display: 'flex',
         paddingHorizontal: 10,
     },
     commentInput: {
@@ -131,6 +132,7 @@ const styles = StyleSheet.create({
         paddingRight: 50,
         flexWrap: "wrap",
         flexShrink: 1,
+        display: 'block',
     },
 })
 

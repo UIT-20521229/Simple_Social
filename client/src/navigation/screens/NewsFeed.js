@@ -45,6 +45,14 @@ export default function NewsFeed() {
             const decodeToken = jwtDecode(token)
             const userId = decodeToken.userId
             dispatch(setUserId(userId))
+
+            await axios.get(`http://${IP}:3200/users/${userId}`)
+                .then(res => {
+                    dispatch(setUsers(res.data))
+                })
+                .catch(err => {
+                    console.log("err:", err)
+                })
         }
         fetchUser()
     }, [userId]);
@@ -87,7 +95,7 @@ export default function NewsFeed() {
         formData.append('content', text);
         formData.append('userPost', userId);
 
-        await axios.post(`http://${IP}:3200/api/posts`, formData, {
+        await axios.post(`http://${IP}:3200/posts/create-posts`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
