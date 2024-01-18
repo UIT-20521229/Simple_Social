@@ -15,7 +15,7 @@ export default function Friends() {
         const fetchFriendRequests = async () => {
             try {
                 const response = await axios.get(
-                    `http://${IP}:3200/api/friend-request/${userId}`
+                    `http://${IP}:3200/users/friend-request/${userId}`
                 );
                 if (response.status === 200) {
                     const friendRequestsData = response.data.map((friendRequest) => ({

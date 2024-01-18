@@ -15,7 +15,7 @@ export default function User({ item }) {
   useEffect(() => {
     const fetchUserFriends = async () => {
       try {
-        const response = await fetch(`http://${IP}:3200/api/friends/${userId}`);
+        const response = await fetch(`http://${IP}:3200/users/friends/${userId}`);
 
         const data = await response.json();
 
@@ -35,7 +35,7 @@ export default function User({ item }) {
   const sendFriendRequest = async (currentUserId, selectedUserId) => {
     console.log("send friend request response");
     try {
-      const response = await fetch(`http://${IP}:3200/api/friend-request`, {
+      const response = await fetch(`http://${IP}:3200/users/friend-request`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -52,38 +52,38 @@ export default function User({ item }) {
 
   return (
     <ListItem style={styles.container} bottomDivider>
-        <Avatar
-          size={20}
-          rounded
-          source={{ uri: 'https://www.w3schools.com/howto/img_avatar.png' }}
-        />
-        <ListItem.Content>
-          <ListItem.Title>
-            <Text style={styles.name}>{item?.name}</Text>
-          </ListItem.Title>
-          <ListItem.Subtitle>
-            <Text style={styles.email}>{item?.email}</Text>
-          </ListItem.Subtitle>
-        </ListItem.Content>
+      <Avatar
+        size={20}
+        rounded
+        source={{ uri: 'https://www.w3schools.com/howto/img_avatar.png' }}
+      />
+      <ListItem.Content>
+        <ListItem.Title>
+          <Text style={styles.name}>{item?.name}</Text>
+        </ListItem.Title>
+        <ListItem.Subtitle>
+          <Text style={styles.email}>{item?.email}</Text>
+        </ListItem.Subtitle>
+      </ListItem.Content>
 
-        <ListItem.Content right>
-          {userFriends.includes(item._id) ? (
-            <Pressable style={styles.buttonFriends}>
-              <Text style={styles.buttonText}>Friends</Text>
-            </Pressable>
-          ) : requestSent || friendRequests.some((friend) => friend._id === item._id) ? (
-            <Pressable style={styles.buttonRequestSent}>
-              <Text style={styles.buttonText}>Request Sent</Text>
-            </Pressable>
-          ) : (
-            <Pressable
-              onPress={() => sendFriendRequest(userId, item._id)}
-              style={styles.buttonAddFriend}
-            >
-              <Text style={styles.buttonText}>Add Friend</Text>
-            </Pressable>
-          )}
-        </ListItem.Content>
+      <ListItem.Content right>
+        {userFriends.includes(item._id) ? (
+          <Pressable style={styles.buttonFriends}>
+            <Text style={styles.buttonText}>Friends</Text>
+          </Pressable>
+        ) : requestSent || friendRequests.some((friend) => friend._id === item._id) ? (
+          <Pressable style={styles.buttonRequestSent}>
+            <Text style={styles.buttonText}>Request Sent</Text>
+          </Pressable>
+        ) : (
+          <Pressable
+            onPress={() => sendFriendRequest(userId, item._id)}
+            style={styles.buttonAddFriend}
+          >
+            <Text style={styles.buttonText}>Add Friend</Text>
+          </Pressable>
+        )}
+      </ListItem.Content>
     </ListItem>
   );
 };

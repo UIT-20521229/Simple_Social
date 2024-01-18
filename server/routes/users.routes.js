@@ -8,7 +8,7 @@ const usersController = require('../controllers/UsersController');
 // authentication
 router.post('/register', usersController.register);
 router.post('/login', usersController.login);
-router.get('/getUser', usersController.getUser);
+router.get('/:userId', usersController.getUser);
 // friends request
 router.post('/friend-request', usersController.send_friend_request);
 router.get('/friend-request/:userId', usersController.get_friend_request);

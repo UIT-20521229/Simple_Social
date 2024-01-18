@@ -25,7 +25,7 @@ router.get('/get-posts', postsController.get_posts);
 // endpoint like posts
 router.put("/active-like", postsController.like_post);
 // endpoint comment posts
-router.post("/create-comment", postsController.comment_post);
+router.post("/create-comment", upload.single('image'), postsController.comment_post);
 // endpoint get comment posts
 router.get("/get-comments/:postId", postsController.get_comment);
 
