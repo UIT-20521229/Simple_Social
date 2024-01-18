@@ -15,8 +15,11 @@ const postSchema = new mongoose.Schema({
         {
             type: mongoose.Schema.Types.ObjectId,
             content: String,
+            userComment: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "users"
+            },
             createdAt: Date.now,
-            ref: 'users'
         }
     ],
     userPost: {

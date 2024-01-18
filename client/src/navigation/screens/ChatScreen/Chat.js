@@ -19,7 +19,7 @@ export default function ChatsScreen() {
   useEffect(() => {
     const acceptedFriendsList = async () => {
       try {
-        const response = await fetch(`http://${IP}:3200/api/accepted-friends/${userId}`);
+        const response = await fetch(`http://${IP}:3200/users/accepted-friends/${userId}`);
 
         const data = await response.json();
 
@@ -52,7 +52,6 @@ export default function ChatsScreen() {
             </TouchableOpacity>
           </View>
         }
-        centerComponent={{ style: styles.header }}
       />
       <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
         {acceptedFriends.map((item, index) => (

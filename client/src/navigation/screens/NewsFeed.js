@@ -11,7 +11,6 @@ import { setUsers, setUserId } from '../../redux/slices/userSlice';
 import { useSelector, useDispatch } from 'react-redux'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { jwtDecode } from 'jwt-decode';
 import { decode } from "base-64";
 import { IP } from '@env'
@@ -46,14 +45,6 @@ export default function NewsFeed() {
             const decodeToken = jwtDecode(token)
             const userId = decodeToken.userId
             dispatch(setUserId(userId))
-
-            await axios.get(`http://${IP}:3200/api/users/${userId}`)
-                .then(res => {
-                    dispatch(setUsers(res.data))
-                })
-                .catch(err => {
-                    console.log("err:", err)
-                })
         }
         fetchUser()
     }, [userId]);
@@ -61,9 +52,8 @@ export default function NewsFeed() {
     // Get all posts
     useEffect(() => {
         const fetchPosts = async () => {
-            await axios.get(`http://${IP}:3200/api/getPosts`)
+            await axios.get(`http://${IP}:3200/posts/get-posts`)
                 .then(res => {
-                    console.log("res:", res)
                     setData(res.data)
                     setLoading(true)
                 })
@@ -162,7 +152,7 @@ export default function NewsFeed() {
                                 index={0}
                                 snapPoints={snapPoints}
                             >
-                                <BottomSheetModalComponent />
+                                <BottomSheetModalComponent postId={post._id} key={post._id} />
                             </BottomSheetModal>
                         </SafeAreaView>
                     )) : <ActivityIndicator size="large" color="#0000ff" />}

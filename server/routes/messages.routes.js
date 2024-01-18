@@ -4,19 +4,6 @@ const path = require('path');
 const multer = require("multer");
 
 const messagesController = require('../controllers/MessagesController');
-
-// ------------------ Messages ------------------ //
-
-// endpoint send messages
-router.post('/messages', upload.single('image'), messagesController.send_messages);
-//endpoint to fetch the messages between two users in the chatRoom
-router.get('/messages/:sendId/:receiveId', messagesController.get_chat_messages);
-//endpoint to delete messages
-router.delete('/messages', messagesController.delete_messages);
-
-
-
-
 // ------------------ Multer ------------------ //
 // Configure multer for handling file uploads
 const storage = multer.diskStorage({
@@ -30,5 +17,15 @@ const storage = multer.diskStorage({
 
 // Configure multer for handling file uploads
 const upload = multer({ storage: storage });
+
+
+// ------------------ Messages ------------------ //
+
+// endpoint send messages
+router.post('/create-messages', upload.single('image'), messagesController.send_messages);
+//endpoint to fetch the messages between two users in the chatRoom
+router.get('/:sendId/:receiveId', messagesController.get_chat_messages);
+//endpoint to delete messages
+router.delete('/delete-messages', messagesController.delete_messages);
 
 module.exports = router;

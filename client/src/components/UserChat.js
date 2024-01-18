@@ -15,7 +15,7 @@ function UserChat({ item }) {
     useEffect(() => {
         const fetchMessages = async () => {
             try {
-                await axios.get(`http://${IP}:3200/api/messages/${userId}/${item._id}`)
+                await axios.get(`http://${IP}:3200/messages/${userId}/${item._id}`)
                     .then(res => {
                         setMessages(res.data)
                     })

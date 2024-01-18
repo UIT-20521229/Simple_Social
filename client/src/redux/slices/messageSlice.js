@@ -11,6 +11,7 @@ export const messageSlice = createSlice({
     reducers: {
         sendMessage(state, action) {
             state.message = GiftedChat.append(state.message, action.payload)
+            console.log(state.message)
         },
         reset: state => initialState,
     },

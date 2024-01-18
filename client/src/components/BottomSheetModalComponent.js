@@ -1,20 +1,24 @@
 import {
     StyleSheet, Text, View, Image,
     FlatList, TextInput,
-    ScrollView, KeyboardAvoidingView
+    ScrollView, KeyboardAvoidingView,
+    TouchableOpacity
 } from "react-native";
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo, useCallback } from "react";
 import { IP } from "@env";
 import { Icon, Input } from '@rneui/themed'
 import axios from "axios";
+import { useSelector } from "react-redux";
 
-const BottomSheetModalComponent = () => {
+const BottomSheetModalComponent = ({ postId }) => {
     const [comment, setComment] = useState("");
     const [comments, setComments] = useState([]);
+    const { userId } = useSelector(state => state.user);
+    const [send, setSend] = useState(false);
 
     useEffect(() => {
         const fetchComments = async () => {
-            await axios.get(`http://${IP}:3200/posts/comment`)
+            await axios.get(`http://${IP}:3200/posts/get-comments/${postId}`)
                 .then(res => {
                     setComments(res.data)
                 })
@@ -23,7 +27,28 @@ const BottomSheetModalComponent = () => {
                 })
         }
         fetchComments()
-    }, [comments]);
+    }, []);
+
+    const sendComment = useCallback(async () => {
+        const data = new FormData
+        data.append("postId", postId)
+        data.append("userComment", userId)
+        data.append("content", comment)
+
+        await axios.post(`http://${IP}:3200/posts/create-comment`, data, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            }
+        })
+            .then(res => {
+                console.log(res.data)
+            })
+            .catch(err => {
+                console.log("err:", err)
+            })
+        setSend(!send)
+        setComment("")
+    }, [])
 
     return (
         <KeyboardAvoidingView
@@ -53,9 +78,12 @@ const BottomSheetModalComponent = () => {
                 <View style={styles.commentInput}>
                     <Input
                         placeholder="Comment here..."
-                        rightIcon={{ type: 'feather', name: 'send' }}
-                        onChangeText={value => this.setState({ comment: value })}
+                        rightIcon={() => <TouchableOpacity onPress={sendComment}>
+                            <Icon name="send" />
+                        </TouchableOpacity>}
+                        onChangeText={value => setComment(value)}
                         inputStyle={{ paddingLeft: 5 }}
+                        value={comment}
                     />
                 </View>
             </View>
@@ -106,4 +134,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default BottomSheetModalComponent;
+export default memo(BottomSheetModalComponent);

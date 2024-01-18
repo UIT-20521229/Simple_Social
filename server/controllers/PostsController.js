@@ -59,6 +59,7 @@ class PostsController {
     async comment_post(req, res) {
         try {
             const { postId, userComment, content } = req.body;
+            console.log(postId)
             const post = await posts.findById(postId);
             if (!post) {
                 return res.status(404).json({ message: "Post not found" });
@@ -66,6 +67,21 @@ class PostsController {
             post.comments.push({ userComment, content });
             await post.save();
             res.status(200).json({ message: "Comment added successfully" });
+        }
+        catch (err) {
+            res.status(500).json({ message: err.message });
+        }
+    }
+    // get comment posts
+    async get_comment(req, res) {
+        try {
+            const { postId } = req.params;
+            const post = await posts.findById(postId);
+            if (!post) {
+                return res.status(404).json({ message: "Post not found" });
+            }
+            console.log('Post Founded!!!');
+            res.status(200).json(post.comments);
         }
         catch (err) {
             res.status(500).json({ message: err.message });

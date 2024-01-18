@@ -16,7 +16,7 @@ export default function ChatMessage() {
     const route = useRoute()
 
     const { message } = useSelector(state => state.message)
-    const [sendMessages, setSendMessages] = useState(true)
+    const [sending, setSending] = useState(true)
     const { receiveId } = route.params
     const { userId } = useSelector(state => state.user)
     const [image, setImage] = useState('')
@@ -27,8 +27,9 @@ export default function ChatMessage() {
 
     useEffect(() => {
         const fetchMessages = () => {
-            axios.get(`http://${IP}:3200/api/messages/${userId}/${receiveId}`)
+            axios.get(`http://${IP}:3200/messages/${userId}/${receiveId}`)
                 .then(res => {
+                    console.log(res.data)
                     dispatch(sendMessage(res.data))
                 })
                 .catch(err => console.log(err))
@@ -37,11 +38,12 @@ export default function ChatMessage() {
         return () => {
             dispatch(reset())
         }
-    }, [sendMessages])
+    }, [sending])
 
     const onSend = async (messages = []) => {
         const msg = messages[0]
         try {
+            dispatch(sendMessage(msg))
             const data = new FormData()
             data.append('text', msg.text)
             data.append('user', msg.user._id)
@@ -51,12 +53,12 @@ export default function ChatMessage() {
                 name: 'image.jpg'
             } || null);
             data.append('receiveId', receiveId)
-            const respone = await axios.post(`http://${IP}:3200/api/messages`, data, {
+            await axios.post(`http://${IP}:3200/messages/create-messages`, data, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             })
-            setSendMessages(!sendMessages)
+            setSending(!sending)
             setImage('')
         } catch (error) {
             console.log(error.status.message)
