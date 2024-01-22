@@ -9,9 +9,6 @@ export default function Splash() {
 
     useEffect(() => {
         animation.current.play();
-        setTimeout(() => {
-            navigation.replace('Login')
-        }, 3000)
     }, []);
 
     return (

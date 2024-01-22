@@ -65,11 +65,13 @@ const BottomSheetModalComponent = ({ postId }) => {
                             <View style={styles.userComment}>
                                 <Image
                                     style={styles.avatar}
-                                    source={{ uri: item.avatar || "https://i.stack.imgur.com/l60Hf.png"}}
+                                    source={{ uri: item.avatar || "https://i.stack.imgur.com/l60Hf.png" }}
                                 />
                                 <View style={styles.comment}>
                                     <Text style={styles.name}>{item.userComment.name}</Text>
-                                    <Text style={styles.content}>asiodjioqwenmonzxoczxcmiojioqwjejzxiocjioasjodijioasjdiojiojqwioejioasjasdasdasdadadaadoi</Text>
+                                    <Text style={styles.content} numberOfLines={3}>asiodjioqwenmonzxoczxcmioj
+                                        ioqwjejzxiocjioasjodijioasjdiojiojqwioejioas
+                                        jasdasdasdadadaadoi</Text>
                                 </View>
                             </View>
                         </ScrollView>}
@@ -122,6 +124,8 @@ const styles = StyleSheet.create({
     },
     comment: {
         flexDirection: "column",
+        flex: 1,
+        justifyContent: "center",
     },
     name: {
         fontSize: 16,
@@ -129,10 +133,12 @@ const styles = StyleSheet.create({
     },
     content: {
         fontSize: 16,
-        paddingRight: 50,
+        paddingRight: 70,
         flexWrap: "wrap",
         flexShrink: 1,
-        display: 'block',
+        lineHeight: 20, // Assuming each line of text is approximately 20 pixels high
+        maxHeight: 30, // Limit to 3 lines of text
+        overflow: 'hidden',
     },
 })
 

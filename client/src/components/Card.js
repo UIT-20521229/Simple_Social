@@ -1,4 +1,4 @@
-import { useState, memo, useMemo, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import {
     StyleSheet, Text, View, Image, TouchableOpacity,
 } from 'react-native';
@@ -7,10 +7,12 @@ import { IP } from '@env'
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Button, ListItem } from '@rneui/themed';
 import axios from 'axios';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { setLike, setShare, setComment } from '../redux/slices/postSlice';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 function Card({ data, onPress }) {
+    const dispatch = useDispatch();
     // Get user from redux
     const { userId } = useSelector(state => state.user);
     // Bottom Sheet
@@ -37,31 +39,27 @@ function Card({ data, onPress }) {
     const [createdAt, setCreatedAt] = useState(date);
     const [image, setImage] = useState(null);
 
-    // Handle image path
-    useEffect(() => {
-        
-    }, []);
-
     // Handle post
-    const handleLike = (e) => {
+    const handleLike = async (e) => {
         const dataForm = {
             postId: data._id,
             userLike: userId,
         }
-        axios.put(`http://${IP}:3200/posts/active-like`, dataForm, {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
-            .then(res => {
-                console.log(res.data);
+        try {
+            const res = await axios.put(`http://${IP}:3200/posts/active-like`, dataForm, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }).then(res => {
+                setActiveLike(prevActiveLike => !prevActiveLike);
+                dispatch(setLike(!activeLike));
             })
-            .catch(err => {
-                console.log(err);
-            })
-        setActiveLike(!activeLike);
+            console.log(res.data);
+        } catch (err) {
+            console.log(err);
+        }
     }
-    
+
 
     const handleShare = (e) => {
         setShare(share + 1);
@@ -120,15 +118,15 @@ function Card({ data, onPress }) {
                                     :
                                     <Icon name="thumbs-up" size={15} color="#000" />
                                 }
-                                <Text style={styles.buttonText}>Likes</Text>
+                                <Text style={styles.buttonText}>Like</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.buttonPost} onPress={onPress}>
                                 <Icon name="comment-o" size={15} color="#000" />
-                                <Text style={styles.buttonText}>Comments</Text>
+                                <Text style={styles.buttonText}>Comment</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.buttonPost} onPress={handleShare}>
                                 <Icon name="share-square-o" size={15} color="#000" />
-                                <Text style={styles.buttonText}>Shares</Text>
+                                <Text style={styles.buttonText}>Share</Text>
                             </TouchableOpacity>
                         </View>
                     </View>

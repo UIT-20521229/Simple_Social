@@ -8,10 +8,12 @@ import { IP } from "@env";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
+import Splash from "../screens/Splash";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
 
   const onHandleLogin = useCallback(async () => {
@@ -36,12 +38,22 @@ export default function Login() {
       });
   })
 
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 3000);
+  }, []);
+
+  if (loading) {
+    return <Splash />;
+  }
+
   return (
     <View style={styles.container}>
       <KeyboardAvoidingView
         behavior="position"
         contentContainerStyle={styles.container}
-        keyboardVerticalOffset={-100}
+        keyboardVerticalOffset={-1000}
       >
         <View style={styles.titleContainer}>
           <Text style={styles.title}>Sign In</Text>
