@@ -45,19 +45,19 @@ function Card({ data, onPress }) {
             postId: data._id,
             userLike: userId,
         }
-        try {
-            const res = await axios.put(`http://${IP}:3200/posts/active-like`, dataForm, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            }).then(res => {
+
+        await axios.put(`http://${IP}:3200/posts/active-like`, dataForm, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(res => {
                 setActiveLike(prevActiveLike => !prevActiveLike);
-                dispatch(setLike(!activeLike));
+                dispatch(setLike());
             })
-            console.log(res.data);
-        } catch (err) {
-            console.log(err);
-        }
+            .catch(err => {
+                console.log("err:", err)
+            })
     }
 
 

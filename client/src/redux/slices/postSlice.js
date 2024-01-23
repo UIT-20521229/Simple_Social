@@ -1,9 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-    like: Boolean,
-    share: Boolean,
-    comment: Boolean,
+    like: false,
+    share: false,
+    comment: false,
 }
 
 export const postSlice = createSlice({
@@ -11,13 +11,13 @@ export const postSlice = createSlice({
     initialState,
     reducers: {
         setLike: (state, action) => {
-            state.like = action.payload
+            state.like = !state.like
         },
         setShare: (state, action) => {
-            state.share = action.payload
+            state.share = !state.share
         },
         setComment: (state, action) => {
-            state.comment = action.payload
+            state.comment = !state.comment
         },
     },
 })
