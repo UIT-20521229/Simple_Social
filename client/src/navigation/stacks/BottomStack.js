@@ -1,8 +1,8 @@
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
-import HomeStack from './HomeStack';
+import FriendStack from './FriendStack';
 import ChatStack from './ChatStack';
 import NewsFeedStack from './NewsFeedStack';
-import { Friends, Setting } from '../screens/index';
+import { Setting } from '../screens/index';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const BottomTab = createMaterialBottomTabNavigator();
@@ -21,7 +21,7 @@ export default function BottomStack() {
                     )
                 }}
             />
-            <BottomTab.Screen name="Friend" component={HomeStack}
+            <BottomTab.Screen name="Friend" component={FriendStack}
                 options={{
                     tabBarIcon: ({ color }) => (
                         <Icon name="account-group" color={color} size={26} />

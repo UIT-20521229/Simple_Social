@@ -8,11 +8,17 @@ import { IP } from "@env";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
+import Splash from "../../screens/Splash";
+import { styles } from "./styles";
+import { useDispatch } from "react-redux";
+import { setIsLogged } from "../../../redux/slices/userSlice";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   const onHandleLogin = useCallback(async () => {
     const user = {
@@ -25,7 +31,7 @@ export default function Login() {
         console.log(response);
         const token = response.data.token;
         await AsyncStorage.setItem("token", token);
-        navigation.replace("Home");
+        dispatch(setIsLogged(true));
       })
       .catch((error) => {
         Alert.alert(
@@ -36,12 +42,22 @@ export default function Login() {
       });
   })
 
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+  }, []);
+
+  if (loading) {
+    return <Splash />;
+  }
+
   return (
     <View style={styles.container}>
       <KeyboardAvoidingView
         behavior="position"
         contentContainerStyle={styles.container}
-        keyboardVerticalOffset={-100}
+        keyboardVerticalOffset={-1000}
       >
         <View style={styles.titleContainer}>
           <Text style={styles.title}>Sign In</Text>
@@ -92,68 +108,3 @@ export default function Login() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "white",
-    padding: StatusBar.currentHeight,
-    alignItems: "center",
-  },
-  titleContainer: {
-    marginTop: 100,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  title: {
-    color: "#4A55A2",
-    fontSize: 17,
-    fontWeight: "600",
-  },
-  subtitle: {
-    fontSize: 17,
-    fontWeight: "600",
-    marginTop: 15,
-  },
-  formContainer: {
-    marginTop: 50,
-  },
-  inputContainer: {
-    marginBottom: 10,
-  },
-  label: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "gray",
-  },
-  input: {
-    fontSize: 18,
-    borderBottomColor: "gray",
-    borderBottomWidth: 1,
-    marginVertical: 10,
-    width: 300,
-  },
-  loginButton: {
-    width: 200,
-    backgroundColor: "#4A55A2",
-    padding: 15,
-    marginTop: 50,
-    marginLeft: "auto",
-    marginRight: "auto",
-    borderRadius: 6,
-  },
-  loginButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  signupButton: {
-    marginTop: 15,
-  },
-  signupButtonText: {
-    textAlign: "center",
-    color: "gray",
-    fontSize: 16,
-  },
-});

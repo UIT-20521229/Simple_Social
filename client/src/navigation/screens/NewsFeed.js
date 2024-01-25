@@ -18,13 +18,19 @@ import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { BottomSheetModalComponent } from '../../components/index';
+import { useTheme } from '@react-navigation/native';
 global.atob = decode;
 
 export default function NewsFeed() {
+    const { colors } = useTheme();
     const hasUnsavedChanges = Boolean(text);
-    const dispatch = useDispatch();
     const navigation = useNavigation();
-    const { userId, userLoading } = useSelector(state => state.user);
+    // Redux
+    const dispatch = useDispatch();
+    const { userId } = useSelector(state => state.user);
+    const { like, share, comment } = useSelector(state => state.post);
+    console.log('like:', like)
+    // Define state
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [text, setText] = useState('');
@@ -58,7 +64,7 @@ export default function NewsFeed() {
     }, [userId]);
 
     // Get all posts
-    useEffect(() => {
+    useLayoutEffect(() => {
         const fetchPosts = async () => {
             await axios.get(`http://${IP}:3200/posts/get-posts`)
                 .then(res => {
@@ -73,7 +79,7 @@ export default function NewsFeed() {
         return () => {
             setData([])
         }
-    }, [activePost])
+    }, [activePost, like, share, comment])
 
     // Prevent user from going back to Login screen
     useEffect(() => {
@@ -120,7 +126,7 @@ export default function NewsFeed() {
 
     return (
         <BottomSheetModalProvider>
-            <View style={styles.container}>
+            <View style={[styles.container, { backgroundColor: colors.background }]}>
                 <ScrollView style={styles.scrollView}>
                     <View style={styles.post}>
                         <View style={styles.postViewInput}>
@@ -174,7 +180,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingTop: StatusBar.currentHeight,
-        backgroundColor: '#fff',
     },
     scrollView: {
 
